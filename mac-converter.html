@@ -8,25 +8,25 @@
 <title>MAC-Adress-Konverter</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Segoe UI", Arial, sans-serif; background: #0d1f35; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
+body { font-family: "Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #47489a 0%, #3b6bb8 45%, #4a8ec8 100%); display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
 .wrap { width: 100%; max-width: 660px; }
-h1 { font-size: 22px; font-weight: 700; margin-bottom: 1.2rem; color: #ffffff; }
-.box { background: #162d4a; border: 1px solid #2a4f7a; border-radius: 10px; padding: 1.3rem; margin-bottom: 0.9rem; }
-label { font-size: 15px; color: #a8d0f5; display: block; margin-bottom: 8px; font-weight: 500; }
-input { width: 100%; font-family: "Courier New", monospace; font-size: 19px; padding: 11px; border: 1px solid #2a4f7a; border-radius: 6px; outline: none; background: #0d1f35; color: #ffffff; }
-input:focus { border-color: #4da3e8; box-shadow: 0 0 0 2px rgba(77,163,232,0.35); }
-input::placeholder { color: #3a5f88; }
-.err { font-size: 15px; color: #ff8080; margin-top: 7px; display: none; }
-.vendor { background: #0d1f35; border: 1px solid #2a5f9a; border-radius: 10px; padding: 1rem 1.3rem; margin-bottom: 0.9rem; display: none; }
-.vendor-lbl { font-size: 12px; color: #6ab0e8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.07em; }
-.vendor-val { font-size: 19px; font-weight: 700; color: #ffffff; }
-.fmt { display: flex; align-items: center; gap: 10px; background: #162d4a; border: 1px solid #2a4a72; border-radius: 6px; padding: 10px 14px; margin-bottom: 5px; }
-.fmt-lbl { font-size: 14px; color: #6ab0e8; width: 210px; flex-shrink: 0; font-weight: 500; }
-.fmt-val { font-family: "Courier New", monospace; font-size: 17px; color: #ffffff; flex: 1; user-select: all; font-weight: 600; }
-.copy { font-size: 13px; padding: 5px 13px; border: 1px solid #3a7ab8; border-radius: 5px; background: #0d1f35; color: #a8d0f5; cursor: pointer; flex-shrink: 0; }
-.copy:hover { background: #1a3a5c; color: #ffffff; border-color: #5aaae0; }
-.copy.ok { color: #5ddd88; border-color: #5ddd88; }
-.hint { text-align: center; padding: 2.5rem; color: #3a6090; font-size: 16px; }
+h1 { font-size: 22px; font-weight: 700; margin-bottom: 1.2rem; color: #ffffff; letter-spacing: 0.03em; }
+.box { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; padding: 1.3rem; margin-bottom: 0.9rem; backdrop-filter: blur(4px); }
+label { font-size: 15px; color: #d8eeff; display: block; margin-bottom: 8px; font-weight: 500; }
+input { width: 100%; font-family: "Courier New", monospace; font-size: 19px; padding: 11px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; outline: none; background: rgba(255,255,255,0.95); color: #1a2535; }
+input:focus { border-color: #0e8a99; box-shadow: 0 0 0 3px rgba(14,138,153,0.35); }
+input::placeholder { color: #8aaccc; }
+.err { font-size: 15px; color: #ffaaaa; margin-top: 7px; display: none; }
+.vendor { background: rgba(255,255,255,0.95); border-radius: 12px; padding: 1rem 1.3rem; margin-bottom: 0.9rem; display: none; }
+.vendor-lbl { font-size: 12px; color: #0e7585; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.07em; }
+.vendor-val { font-size: 19px; font-weight: 700; color: #1a2535; }
+.fmt { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.95); border-radius: 8px; padding: 10px 14px; margin-bottom: 5px; }
+.fmt-lbl { font-size: 14px; color: #0e7585; width: 210px; flex-shrink: 0; font-weight: 600; }
+.fmt-val { font-family: "Courier New", monospace; font-size: 17px; color: #1a2535; flex: 1; user-select: all; font-weight: 700; }
+.copy { font-size: 13px; padding: 5px 13px; border: 1px solid #b0c8e0; border-radius: 5px; background: #f0f6ff; color: #3a6090; cursor: pointer; flex-shrink: 0; }
+.copy:hover { background: #ddeeff; color: #1a4070; border-color: #7aaad0; }
+.copy.ok { color: #1a9050; border-color: #1a9050; background: #e8fff0; }
+.hint { text-align: center; padding: 2.5rem; color: rgba(255,255,255,0.5); font-size: 16px; }
 </style>
 </head>
 <body>
