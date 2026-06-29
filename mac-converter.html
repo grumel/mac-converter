@@ -49,6 +49,20 @@ input::placeholder { color: #8aaccc; }
 .net-inputs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: end; margin-bottom: 0.9rem; }
 .net-inputs label { margin-bottom: 5px; }
 .slash { font-size: 28px; color: #fff; font-weight: 700; padding-bottom: 8px; text-align: center; }
+
+.port-table { width: 100%; border-collapse: collapse; margin-top: 0.6rem; }
+.port-table th { font-size: 11px; color: #0e7585; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; padding: 6px 10px; background: rgba(255,255,255,0.95); border-bottom: 2px solid #c8dff0; text-align: left; }
+.port-table td { font-size: 14px; padding: 8px 10px; background: rgba(255,255,255,0.95); border-bottom: 1px solid #e0ecf8; color: #1a2535; vertical-align: top; }
+.port-table tr:last-child td { border-bottom: none; }
+.port-table tr:hover td { background: #eef6ff; }
+.port-num { font-family: "Courier New", monospace; font-weight: 700; color: #1a2535; }
+.port-proto { font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+.proto-tcp { background: #ddeeff; color: #1a4070; }
+.proto-udp { background: #ffeedd; color: #703a1a; }
+.proto-both { background: #eeddff; color: #3a1a70; }
+.port-name { font-weight: 600; color: #0e4a65; }
+.port-desc { color: #445; font-size: 13px; }
+.port-nores { text-align: center; padding: 2rem; color: rgba(255,255,255,0.5); font-size: 15px; }
 </style>
 </head>
 <body>
@@ -58,6 +72,7 @@ input::placeholder { color: #8aaccc; }
   <div class="tabs">
     <button class="tab active" onclick="switchTab('mac',this)">MAC-Konverter</button>
     <button class="tab" onclick="switchTab('net',this)">Netzwerkrechner</button>
+    <button class="tab" onclick="switchTab('port',this)">Port-Suche</button>
   </div>
 
   <!-- MAC Tab -->
@@ -113,6 +128,18 @@ input::placeholder { color: #8aaccc; }
       <div class="err" id="net2-err"></div>
     </div>
     <div id="net2-out"></div>
+  </div>
+
+  <!-- Port Tab -->
+  <div id="tab-port" class="panel">
+    <div class="box">
+      <label>Portnummer oder Dienstname suchen</label>
+      <input id="port-inp" type="text" placeholder="z.B. 443 oder rdp oder ssh"
+             oninput="runPort(this.value)"
+             onpaste="var el=this; setTimeout(function(){ runPort(el.value); }, 10)" />
+    </div>
+    <div id="port-out"></div>
+    <div class="hint" id="port-hint">Portnummer oder Dienstname eingeben</div>
   </div>
 </div>
 
@@ -295,6 +322,108 @@ function runNet2() {
     +row('Erste IP', ip2str(a), '')
     +row('Zweite IP', ip2str(b), '')
   +'</div>';
+}
+
+/* ══════════════════════════════
+   PORT-NACHSCHLAGEWERK
+══════════════════════════════ */
+// [port, proto, name, beschreibung]
+var PORTS = [
+  [20,'TCP','FTP-Data','FTP Datenübertragung'],
+  [21,'TCP','FTP','FTP Steuerverbindung'],
+  [22,'TCP','SSH','Secure Shell – verschlüsselte Fernwartung'],
+  [23,'TCP','Telnet','Unverschlüsselte Fernwartung (veraltet)'],
+  [25,'TCP','SMTP','E-Mail-Versand zwischen Servern'],
+  [53,'BOTH','DNS','Domain Name System – Namensauflösung'],
+  [67,'UDP','DHCP','DHCP Server – IP-Adressvergabe'],
+  [68,'UDP','DHCP','DHCP Client – IP-Adressanfrage'],
+  [69,'UDP','TFTP','Trivial File Transfer Protocol'],
+  [80,'TCP','HTTP','Unverschlüsseltes Web'],
+  [88,'TCP','Kerberos','Kerberos-Authentifizierung (Active Directory)'],
+  [110,'TCP','POP3','E-Mail-Abruf (Post Office Protocol)'],
+  [119,'TCP','NNTP','News-Gruppen-Protokoll'],
+  [123,'UDP','NTP','Network Time Protocol – Zeitsynchronisation'],
+  [135,'TCP','RPC','Windows Remote Procedure Call / DCOM'],
+  [137,'UDP','NetBIOS','NetBIOS Namensauflösung'],
+  [138,'UDP','NetBIOS','NetBIOS Datagramm-Dienst'],
+  [139,'TCP','NetBIOS','NetBIOS Session-Dienst (SMB legacy)'],
+  [143,'TCP','IMAP','E-Mail-Abruf (Internet Message Access Protocol)'],
+  [161,'UDP','SNMP','Simple Network Management Protocol'],
+  [162,'UDP','SNMP Trap','SNMP Trap-Benachrichtigungen'],
+  [179,'TCP','BGP','Border Gateway Protocol – Internet-Routing'],
+  [389,'TCP','LDAP','Lightweight Directory Access Protocol (Active Directory)'],
+  [443,'TCP','HTTPS','Verschlüsseltes Web (TLS)'],
+  [445,'TCP','SMB','Windows-Dateifreigabe / Active Directory'],
+  [465,'TCP','SMTPS','E-Mail-Versand verschlüsselt (veraltet, heute 587)'],
+  [500,'UDP','IKE','Internet Key Exchange (IPsec VPN)'],
+  [514,'UDP','Syslog','System-Protokollmeldungen'],
+  [515,'TCP','LPD','Line Printer Daemon – Druckerprotokoll'],
+  [587,'TCP','SMTP Submission','E-Mail-Einlieferung vom Client (STARTTLS)'],
+  [631,'TCP','IPP','Internet Printing Protocol (CUPS)'],
+  [636,'TCP','LDAPS','LDAP über TLS (Active Directory verschlüsselt)'],
+  [993,'TCP','IMAPS','IMAP über TLS'],
+  [995,'TCP','POP3S','POP3 über TLS'],
+  [1080,'TCP','SOCKS','SOCKS-Proxy'],
+  [1194,'UDP','OpenVPN','OpenVPN Standard-Port'],
+  [1433,'TCP','MSSQL','Microsoft SQL Server'],
+  [1434,'UDP','MSSQL Browser','SQL Server Browser-Dienst'],
+  [1521,'TCP','Oracle DB','Oracle Datenbank'],
+  [1701,'UDP','L2TP','Layer 2 Tunneling Protocol (VPN)'],
+  [1723,'TCP','PPTP','Point-to-Point Tunneling Protocol (VPN)'],
+  [1812,'UDP','RADIUS','RADIUS Authentifizierung'],
+  [1813,'UDP','RADIUS','RADIUS Accounting'],
+  [2049,'TCP','NFS','Network File System'],
+  [2082,'TCP','cPanel','cPanel Web-Hosting-Verwaltung'],
+  [2083,'TCP','cPanel SSL','cPanel verschlüsselt'],
+  [2181,'TCP','ZooKeeper','Apache ZooKeeper'],
+  [2375,'TCP','Docker','Docker API (unverschlüsselt)'],
+  [2376,'TCP','Docker TLS','Docker API (verschlüsselt)'],
+  [3306,'TCP','MySQL','MySQL / MariaDB Datenbank'],
+  [3389,'TCP','RDP','Remote Desktop Protocol – Windows Fernzugriff'],
+  [3690,'TCP','SVN','Subversion Versionsverwaltung'],
+  [4443,'TCP','HTTPS alt','Alternativer HTTPS-Port'],
+  [4500,'UDP','IPsec NAT','IPsec NAT-Traversal'],
+  [5060,'BOTH','SIP','Session Initiation Protocol (VoIP)'],
+  [5061,'TCP','SIP TLS','SIP über TLS (VoIP verschlüsselt)'],
+  [5432,'TCP','PostgreSQL','PostgreSQL Datenbank'],
+  [5900,'TCP','VNC','Virtual Network Computing – Fernzugriff'],
+  [5985,'TCP','WinRM','Windows Remote Management (HTTP)'],
+  [5986,'TCP','WinRM SSL','Windows Remote Management (HTTPS)'],
+  [6379,'TCP','Redis','Redis In-Memory-Datenbank'],
+  [6443,'TCP','Kubernetes','Kubernetes API Server'],
+  [8080,'TCP','HTTP alt','Alternativer HTTP-Port / Proxy'],
+  [8443,'TCP','HTTPS alt','Alternativer HTTPS-Port'],
+  [8888,'TCP','Jupyter','Jupyter Notebook'],
+  [9200,'TCP','Elasticsearch','Elasticsearch REST API'],
+  [9300,'TCP','Elasticsearch','Elasticsearch Cluster-Kommunikation'],
+  [27017,'TCP','MongoDB','MongoDB Datenbank'],
+  [49152,null,'Ephemeral','Dynamische / private Ports (49152–65535)']
+];
+
+function runPort(val) {
+  var out=document.getElementById('port-out'), hint=document.getElementById('port-hint');
+  val=(val||'').trim().toLowerCase();
+  if(!val){ out.innerHTML=''; hint.style.display='block'; return; }
+  hint.style.display='none';
+  var results=PORTS.filter(function(p){
+    return String(p[0])===val || p[2].toLowerCase().indexOf(val)!==-1 || p[3].toLowerCase().indexOf(val)!==-1;
+  });
+  if(!results.length){
+    out.innerHTML='<div class="port-nores">Kein Eintrag für „'+val+'" gefunden</div>';
+    return;
+  }
+  var proto_html = {
+    'TCP':'<span class="port-proto proto-tcp">TCP</span>',
+    'UDP':'<span class="port-proto proto-udp">UDP</span>',
+    'BOTH':'<span class="port-proto proto-tcp">TCP</span> <span class="port-proto proto-udp">UDP</span>'
+  };
+  var rows=results.map(function(p){
+    var pr=p[1]?proto_html[p[1]]:'';
+    return '<tr><td class="port-num">'+p[0]+'</td><td>'+pr+'</td><td class="port-name">'+p[2]+'</td><td class="port-desc">'+p[3]+'</td></tr>';
+  }).join('');
+  out.innerHTML='<div style="background:rgba(255,255,255,0.95);border-radius:8px;overflow:hidden;">'
+    +'<table class="port-table"><thead><tr><th>Port</th><th>Protokoll</th><th>Dienst</th><th>Beschreibung</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table></div>';
 }
 
 /* ── Kopieren ── */
