@@ -480,7 +480,27 @@ function doRdns() {
     .catch(function(e){ btn.disabled=false; btn.textContent='Nachschlagen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler ('+e+')</span>'); });
 }
 
-/* WHOIS via RDAP (rdap.org) */
+/* WHOIS via RDAP – TLD-spezifische Server */
+var RDAP_TLD = {
+  'de':'https://rdap.denic.de/domain/',
+  'at':'https://rdap.nic.at/domain/',
+  'ch':'https://rdap.nic.ch/domain/',
+  'li':'https://rdap.nic.ch/domain/',
+  'com':'https://rdap.verisign.com/com/v1/domain/',
+  'net':'https://rdap.verisign.com/net/v1/domain/',
+  'org':'https://rdap.publicinterestregistry.org/rdap/domain/',
+  'io':'https://rdap.nic.io/domain/',
+  'eu':'https://rdap.eu/domain/',
+  'fr':'https://rdap.nic.fr/domain/',
+  'nl':'https://rdap.nic.nl/domain/',
+  'uk':'https://rdap.nominet.uk/uk/domain/',
+  'co.uk':'https://rdap.nominet.uk/uk/domain/',
+  'info':'https://rdap.afilias.info/rdap/info/domain/',
+  'biz':'https://rdap.afilias.info/rdap/biz/domain/',
+  'app':'https://rdap.nic.google/domain/',
+  'dev':'https://rdap.nic.google/domain/',
+};
+
 function doWhois() {
   var inp = document.getElementById('whois-inp').value.trim();
   var out = document.getElementById('whois-out');
@@ -489,8 +509,17 @@ function doWhois() {
   out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Whois wird abgefragt...</div>';
   btn.disabled = true; btn.textContent = '...';
   var isIP = /^[\d.]+$/.test(inp);
-  var rdap = isIP ? 'https://rdap.org/ip/'+encodeURIComponent(inp) : 'https://rdap.org/domain/'+encodeURIComponent(inp);
-  var url = 'https://corsproxy.io/?'+encodeURIComponent(rdap);
+  var rdap;
+  if (isIP) {
+    rdap = 'https://rdap.arin.net/registry/ip/'+encodeURIComponent(inp);
+  } else {
+    var parts = inp.toLowerCase().split('.');
+    var tld2 = parts.slice(-2).join('.');
+    var tld1 = parts[parts.length-1];
+    var base = RDAP_TLD[tld2] || RDAP_TLD[tld1] || 'https://rdap.org/domain/';
+    rdap = base + encodeURIComponent(inp);
+  }
+  var url = isIP ? rdap : 'https://corsproxy.io/?'+encodeURIComponent(rdap);
   fetch(url)
     .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
     .then(function(j){
