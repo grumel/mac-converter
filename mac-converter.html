@@ -12,8 +12,8 @@ body { font-family: "Segoe UI", Arial, sans-serif; background: linear-gradient(1
 .wrap { width: 100%; max-width: 680px; }
 h1 { font-size: 22px; font-weight: 700; margin-bottom: 1.2rem; color: #ffffff; letter-spacing: 0.03em; }
 
-.tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
-.tab { padding: 9px 22px; border-radius: 8px 8px 0 0; border: none; font-size: 15px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); transition: all 0.15s; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+.tab { padding: 8px 16px; border-radius: 8px 8px 0 0; border: none; font-size: 14px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); transition: all 0.15s; }
 .tab.active { background: rgba(255,255,255,0.95); color: #1a2535; }
 .tab:hover:not(.active) { background: rgba(255,255,255,0.25); color: #fff; }
 
@@ -74,6 +74,9 @@ input::placeholder { color: #8aaccc; }
     <button class="tab" onclick="switchTab('net',this)">Netzwerkrechner</button>
     <button class="tab" onclick="switchTab('port',this)">Port-Suche</button>
     <button class="tab" onclick="switchTab('ping',this)">Ping</button>
+    <button class="tab" onclick="switchTab('rdns',this)">Reverse DNS</button>
+    <button class="tab" onclick="switchTab('whois',this)">Whois</button>
+    <button class="tab" onclick="switchTab('trace',this)">Traceroute</button>
   </div>
 
   <!-- MAC Tab -->
@@ -143,6 +146,46 @@ input::placeholder { color: #8aaccc; }
       </div>
     </div>
     <div id="ping-out"></div>
+  </div>
+
+  <!-- Reverse DNS Tab -->
+  <div id="tab-rdns" class="panel">
+    <div class="box">
+      <label>Öffentliche IP-Adresse</label>
+      <input id="rdns-inp" type="text" placeholder="z.B. 8.8.8.8"
+             onkeydown="if(event.key==='Enter') doHT('rdns')" />
+      <div style="margin-top:0.8rem;">
+        <button id="rdns-btn" onclick="doHT('rdns')" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Nachschlagen</button>
+      </div>
+    </div>
+    <div id="rdns-out"></div>
+  </div>
+
+  <!-- Whois Tab -->
+  <div id="tab-whois" class="panel">
+    <div class="box">
+      <label>Domain oder IP-Adresse</label>
+      <input id="whois-inp" type="text" placeholder="z.B. example.com oder 8.8.8.8"
+             onkeydown="if(event.key==='Enter') doHT('whois')" />
+      <div style="margin-top:0.8rem;">
+        <button id="whois-btn" onclick="doHT('whois')" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Abfragen</button>
+      </div>
+    </div>
+    <div id="whois-out"></div>
+  </div>
+
+  <!-- Traceroute Tab -->
+  <div id="tab-trace" class="panel">
+    <div class="box">
+      <label>Hostname oder öffentliche IP-Adresse</label>
+      <input id="trace-inp" type="text" placeholder="z.B. google.com oder 8.8.8.8"
+             onkeydown="if(event.key==='Enter') doHT('trace')" />
+      <div style="margin-top:0.8rem; display:flex; gap:8px; align-items:center;">
+        <button id="trace-btn" onclick="doHT('trace')" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Traceroute starten</button>
+        <span style="font-size:12px;color:rgba(255,255,255,0.5);">Kann 20–30 Sek. dauern</span>
+      </div>
+    </div>
+    <div id="trace-out"></div>
   </div>
 
   <!-- Port Tab -->
@@ -492,6 +535,48 @@ function doPing() {
     })
     .catch(function(e){
       btn.disabled = false; btn.textContent = 'Ping senden';
+      out.innerHTML = '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;color:#c0392b;font-weight:700;">Abfrage fehlgeschlagen ('+e+')</div>';
+    });
+}
+
+/* ══════════════════════════════
+   REVERSE DNS / WHOIS / TRACEROUTE
+   Gemeinsame HackerTarget-Hilfsfunktion
+══════════════════════════════ */
+var HT_CFG = {
+  rdns:  { api: 'reversedns',  label: 'Reverse DNS',  pre: true  },
+  whois: { api: 'whois',       label: 'Whois',        pre: true  },
+  trace: { api: 'traceroute',  label: 'Traceroute',   pre: true  }
+};
+
+function doHT(name) {
+  var cfg  = HT_CFG[name];
+  var inp  = document.getElementById(name+'-inp').value.trim();
+  var out  = document.getElementById(name+'-out');
+  var btn  = document.getElementById(name+'-btn');
+  if (!inp) return;
+
+  out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">'+cfg.label+' wird abgefragt…</div>';
+  btn.disabled = true; btn.textContent = '…';
+
+  var url = 'https://api.hackertarget.com/'+cfg.api+'/?q='+encodeURIComponent(inp);
+  fetch(url)
+    .then(function(r){ return r.ok ? r.text() : Promise.reject(r.status); })
+    .then(function(txt){
+      btn.disabled = false; btn.textContent = btn.dataset.label || btn.textContent.replace('…', cfg.label);
+      // restore button label from original HTML
+      btn.textContent = ({rdns:'Nachschlagen', whois:'Abfragen', trace:'Traceroute starten'})[name];
+
+      var isError = /^error|api count/i.test(txt.trim());
+      out.innerHTML = '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;">'
+        + (isError
+            ? '<div style="color:#c0392b;font-weight:700;">Fehler</div><pre style="font-size:13px;color:#445;white-space:pre-wrap;margin-top:6px;">'+txt+'</pre>'
+            : '<pre style="font-family:\'Courier New\',monospace;font-size:13px;color:#1a2535;white-space:pre-wrap;line-height:1.6;">'+txt+'</pre>')
+        + '</div>';
+    })
+    .catch(function(e){
+      btn.disabled = false;
+      btn.textContent = ({rdns:'Nachschlagen', whois:'Abfragen', trace:'Traceroute starten'})[name];
       out.innerHTML = '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;color:#c0392b;font-weight:700;">Abfrage fehlgeschlagen ('+e+')</div>';
     });
 }
