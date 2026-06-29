@@ -469,7 +469,7 @@ function doRdns() {
   var ptr = [(ip&255),(ip>>>8&255),(ip>>>16&255),(ip>>>24&255)].join('.')+'.in-addr.arpa';
   out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Wird aufgeloest...</div>';
   btn.disabled = true; btn.textContent = '...';
-  fetch('https://dns.google/resolve?name='+encodeURIComponent(ptr)+'&type=PTR')
+  fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(ptr)+'&type=PTR', {headers:{Accept:'application/dns-json'}})
     .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
     .then(function(j){
       btn.disabled=false; btn.textContent='Nachschlagen';
