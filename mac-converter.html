@@ -8,25 +8,25 @@
 <title>MAC-Adress-Konverter</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Segoe UI", Arial, sans-serif; background: #1e3a5f; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
-.wrap { width: 100%; max-width: 640px; }
-h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.2rem; color: #d6e8ff; }
-.box { background: #253f63; border: 1px solid #3a5f8f; border-radius: 10px; padding: 1.2rem; margin-bottom: 0.8rem; }
-label { font-size: 14px; color: #9bbcdf; display: block; margin-bottom: 7px; }
-input { width: 100%; font-family: "Courier New", monospace; font-size: 17px; padding: 10px; border: 1px solid #3a5f8f; border-radius: 6px; outline: none; background: #1a3050; color: #e8f4ff; }
-input:focus { border-color: #5b9bd5; box-shadow: 0 0 0 2px rgba(91,155,213,0.3); }
-input::placeholder { color: #4a6f99; }
-.err { font-size: 14px; color: #f08080; margin-top: 6px; display: none; }
-.vendor { background: #1a3a5c; border: 1px solid #3a6090; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; display: none; }
-.vendor-lbl { font-size: 12px; color: #7aaed6; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.05em; }
-.vendor-val { font-size: 17px; font-weight: 600; color: #c8e4ff; }
-.fmt { display: flex; align-items: center; gap: 10px; background: #253f63; border: 1px solid #3a5a88; border-radius: 6px; padding: 9px 12px; margin-bottom: 4px; }
-.fmt-lbl { font-size: 13px; color: #7aaed6; width: 200px; flex-shrink: 0; }
-.fmt-val { font-family: "Courier New", monospace; font-size: 15px; color: #e8f4ff; flex: 1; user-select: all; }
-.copy { font-size: 13px; padding: 4px 12px; border: 1px solid #4a7aaa; border-radius: 5px; background: #1a3050; color: #9bbcdf; cursor: pointer; flex-shrink: 0; }
-.copy:hover { background: #2a4a70; color: #c8e4ff; }
-.copy.ok { color: #5dbb7a; border-color: #5dbb7a; }
-.hint { text-align: center; padding: 2.5rem; color: #4a6f99; font-size: 15px; }
+body { font-family: "Segoe UI", Arial, sans-serif; background: #0d1f35; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
+.wrap { width: 100%; max-width: 660px; }
+h1 { font-size: 22px; font-weight: 700; margin-bottom: 1.2rem; color: #ffffff; }
+.box { background: #162d4a; border: 1px solid #2a4f7a; border-radius: 10px; padding: 1.3rem; margin-bottom: 0.9rem; }
+label { font-size: 15px; color: #a8d0f5; display: block; margin-bottom: 8px; font-weight: 500; }
+input { width: 100%; font-family: "Courier New", monospace; font-size: 19px; padding: 11px; border: 1px solid #2a4f7a; border-radius: 6px; outline: none; background: #0d1f35; color: #ffffff; }
+input:focus { border-color: #4da3e8; box-shadow: 0 0 0 2px rgba(77,163,232,0.35); }
+input::placeholder { color: #3a5f88; }
+.err { font-size: 15px; color: #ff8080; margin-top: 7px; display: none; }
+.vendor { background: #0d1f35; border: 1px solid #2a5f9a; border-radius: 10px; padding: 1rem 1.3rem; margin-bottom: 0.9rem; display: none; }
+.vendor-lbl { font-size: 12px; color: #6ab0e8; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.07em; }
+.vendor-val { font-size: 19px; font-weight: 700; color: #ffffff; }
+.fmt { display: flex; align-items: center; gap: 10px; background: #162d4a; border: 1px solid #2a4a72; border-radius: 6px; padding: 10px 14px; margin-bottom: 5px; }
+.fmt-lbl { font-size: 14px; color: #6ab0e8; width: 210px; flex-shrink: 0; font-weight: 500; }
+.fmt-val { font-family: "Courier New", monospace; font-size: 17px; color: #ffffff; flex: 1; user-select: all; font-weight: 600; }
+.copy { font-size: 13px; padding: 5px 13px; border: 1px solid #3a7ab8; border-radius: 5px; background: #0d1f35; color: #a8d0f5; cursor: pointer; flex-shrink: 0; }
+.copy:hover { background: #1a3a5c; color: #ffffff; border-color: #5aaae0; }
+.copy.ok { color: #5ddd88; border-color: #5ddd88; }
+.hint { text-align: center; padding: 2.5rem; color: #3a6090; font-size: 16px; }
 </style>
 </head>
 <body>
