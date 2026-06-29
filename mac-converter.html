@@ -515,7 +515,7 @@ function doWhois() {
     var results = {};
     var done = 0;
     types.forEach(function(type){
-      fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(inp)+'&type='+type, {headers:{Accept:'application/dns-json'}})
+      fetch('https://dns.google/resolve?name='+encodeURIComponent(inp)+'&type='+type)
         .then(function(r){ return r.json(); })
         .then(function(j){
           if(j.Answer && j.Answer.length) results[type]=j.Answer;
