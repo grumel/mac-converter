@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1e3a5f">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%2347489a'/><circle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='3'/><line x1='32' y1='18' x2='32' y2='46' stroke='white' stroke-width='2'/><line x1='18' y1='32' x2='46' y2='32' stroke='white' stroke-width='2'/><ellipse cx='32' cy='32' rx='7' ry='14' fill='none' stroke='white' stroke-width='2'/><circle cx='32' cy='32' r='3' fill='white'/></svg>">
 <title>Netzwerk-Tools</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -73,7 +74,7 @@ input::placeholder { color: #8aaccc; }
     <button class="tab active" onclick="switchTab('mac',this)">MAC-Konverter</button>
     <button class="tab" onclick="switchTab('net',this)">Netzwerkrechner</button>
     <button class="tab" onclick="switchTab('port',this)">Port-Suche</button>
-    <button class="tab" onclick="switchTab('rdns',this)">Reverse DNS</button>
+
     <button class="tab" onclick="switchTab('whois',this)">Domain/IP Info</button>
   </div>
 
@@ -130,19 +131,6 @@ input::placeholder { color: #8aaccc; }
       <div class="err" id="net2-err"></div>
     </div>
     <div id="net2-out"></div>
-  </div>
-
-  <!-- Reverse DNS Tab -->
-  <div id="tab-rdns" class="panel">
-    <div class="box">
-      <label>Öffentliche IP-Adresse</label>
-      <input id="rdns-inp" type="text" placeholder="z.B. 8.8.8.8"
-             onkeydown="if(event.key==='Enter') doRdns()" />
-      <div style="margin-top:0.8rem;">
-        <button id="rdns-btn" onclick="doRdns()" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Nachschlagen</button>
-      </div>
-    </div>
-    <div id="rdns-out"></div>
   </div>
 
   <!-- Domain/IP Info Tab -->
@@ -458,27 +446,6 @@ function runPort(val) {
    REVERSE DNS / WHOIS
    Gemeinsame HackerTarget-Hilfsfunktion
 ══════════════════════════════ */
-/* REVERSE DNS via Google DNS-over-HTTPS */
-function doRdns() {
-  var inp = document.getElementById('rdns-inp').value.trim();
-  var out = document.getElementById('rdns-out');
-  var btn = document.getElementById('rdns-btn');
-  if (!inp) return;
-  var ip = parseIP(inp);
-  if (ip === null) { out.innerHTML = htCard('<span style="color:#c0392b;font-weight:700;">Ungueltige IP-Adresse</span>'); return; }
-  var ptr = [(ip&255),(ip>>>8&255),(ip>>>16&255),(ip>>>24&255)].join('.')+'.in-addr.arpa';
-  out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Wird aufgeloest...</div>';
-  btn.disabled = true; btn.textContent = '...';
-  fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(ptr)+'&type=PTR', {headers:{Accept:'application/dns-json'}})
-    .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
-    .then(function(j){
-      btn.disabled=false; btn.textContent='Nachschlagen';
-      if(!j.Answer||!j.Answer.length){ out.innerHTML=htCard('<div style="color:#888;">Kein PTR-Eintrag fuer <b>'+inp+'</b></div>'); return; }
-      var rows=htNetRow('IP',inp)+j.Answer.map(function(a){ return htNetRow('PTR',a.data.replace(/\.$/,'')); }).join('');
-      out.innerHTML='<div class="net-grid">'+rows+'</div>';
-    })
-    .catch(function(e){ btn.disabled=false; btn.textContent='Nachschlagen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler ('+e+')</span>'); });
-}
 
 /* Whois – öffnet whois.com im neuen Tab */
 function doWhois() {
