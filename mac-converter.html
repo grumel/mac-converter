@@ -83,22 +83,36 @@ input::placeholder { color: #8aaccc; }
       <div class="net-inputs">
         <div>
           <label>IP-Adresse</label>
-          <input id="net-ip" type="text" placeholder="192.168.1.100"
-                 oninput="runNet()"
-                 onpaste="setTimeout(runNet, 10)" />
+          <input id="net-ip" type="text" placeholder="192.168.1.100" oninput="runNet()" onpaste="setTimeout(runNet,10)" />
         </div>
         <div class="slash">/</div>
         <div>
           <label>Präfix / Maske</label>
-          <input id="net-mask" type="text" placeholder="24 oder 255.255.255.0"
-                 oninput="runNet()"
-                 onpaste="setTimeout(runNet, 10)" />
+          <input id="net-mask" type="text" placeholder="24 oder 255.255.255.0" oninput="runNet()" onpaste="setTimeout(runNet,10)" />
         </div>
       </div>
       <div class="err" id="net-err"></div>
     </div>
     <div id="net-out"></div>
     <div class="hint" id="net-hint">IP-Adresse und Subnetzmaske eingeben</div>
+
+    <div style="border-top:1px solid rgba(255,255,255,0.2); margin:1rem 0;"></div>
+
+    <div class="box">
+      <label style="margin-bottom:1rem; display:block;">Kleinstes Subnetz das beide IP-Adressen enthält</label>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <div>
+          <label>Erste IP-Adresse</label>
+          <input id="net-ip2a" type="text" placeholder="192.168.1.10" oninput="runNet2()" onpaste="setTimeout(runNet2,10)" />
+        </div>
+        <div>
+          <label>Zweite IP-Adresse</label>
+          <input id="net-ip2b" type="text" placeholder="192.168.1.200" oninput="runNet2()" onpaste="setTimeout(runNet2,10)" />
+        </div>
+      </div>
+      <div class="err" id="net2-err"></div>
+    </div>
+    <div id="net2-out"></div>
   </div>
 </div>
 
@@ -237,6 +251,49 @@ function runNet() {
     +row('Nutzbare Hosts', hosts.toLocaleString('de'), '')
     +row('IP-Klasse', ipClass(ip), '')
     +row('Eingegebene IP', ip2str(ip), cidr<32?('Hostanteil: '+ip2str((ip&wildcard)>>>0)):'')
+  +'</div>';
+}
+
+/* ── Kleinstes gemeinsames Subnetz ── */
+function runNet2() {
+  var aEl=document.getElementById('net-ip2a'), bEl=document.getElementById('net-ip2b'),
+      err=document.getElementById('net2-err'), out=document.getElementById('net2-out');
+  var aStr=aEl.value.trim(), bStr=bEl.value.trim();
+  if(!aStr&&!bStr){ err.style.display='none'; out.innerHTML=''; return; }
+  var a=parseIP(aStr), b=parseIP(bStr);
+  if(a===null&&aStr){ err.textContent='Erste IP-Adresse ungültig.'; err.style.display='block'; out.innerHTML=''; return; }
+  if(b===null&&bStr){ err.textContent='Zweite IP-Adresse ungültig.'; err.style.display='block'; out.innerHTML=''; return; }
+  err.style.display='none';
+  if(a===null||b===null){ out.innerHTML=''; return; }
+
+  var xor=(a^b)>>>0;
+  var cidr=32;
+  if(xor!==0){
+    var msb=Math.floor(Math.log2(xor));
+    cidr=31-msb;
+  }
+  var mask=cidr===0?0:(0xFFFFFFFF<<(32-cidr))>>>0;
+  var network=(a&mask)>>>0;
+  var broadcast=(network|(~mask>>>0))>>>0;
+  var wildcard=(~mask)>>>0;
+  var hosts=cidr>=31?Math.pow(2,32-cidr):Math.pow(2,32-cidr)-2;
+  var first=cidr>=31?network:(network+1)>>>0;
+  var last=cidr>=31?broadcast:(broadcast-1)>>>0;
+
+  function row(lbl,val,sub,wide){
+    return '<div class="net-row'+(wide?' wide':'')+'"><div class="net-lbl">'+lbl+'</div><div class="net-val">'+val+'</div>'+(sub?'<div class="net-sub">'+sub+'</div>':'')+'</div>';
+  }
+
+  out.innerHTML='<div class="net-grid" style="margin-top:0.7rem;">'
+    +row('Kleinstes Subnetz', ip2str(network)+'/'+cidr, '', true)
+    +row('Subnetzmaske', ip2str(mask), '')
+    +row('Wildcard-Maske', ip2str(wildcard), '')
+    +row('Broadcast', ip2str(broadcast), '')
+    +row('Erster Host', ip2str(first), '')
+    +row('Letzter Host', ip2str(last), '')
+    +row('Nutzbare Hosts', hosts.toLocaleString('de'), '')
+    +row('Erste IP', ip2str(a), '')
+    +row('Zweite IP', ip2str(b), '')
   +'</div>';
 }
 
