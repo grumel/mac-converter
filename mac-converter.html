@@ -480,72 +480,11 @@ function doRdns() {
     .catch(function(e){ btn.disabled=false; btn.textContent='Nachschlagen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler ('+e+')</span>'); });
 }
 
-/* Domain/IP Info – DNS via Cloudflare DoH + IP-Info via ipwhois.app */
+/* Whois – öffnet whois.com im neuen Tab */
 function doWhois() {
   var inp = document.getElementById('whois-inp').value.trim();
-  var out = document.getElementById('whois-out');
-  var btn = document.getElementById('whois-btn');
   if (!inp) return;
-  out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Wird abgefragt...</div>';
-  btn.disabled = true; btn.textContent = '...';
-
-  var isIP = /^[\d.]+$/.test(inp);
-
-  if (isIP) {
-    fetch('https://ipwhois.app/json/'+encodeURIComponent(inp)+'?lang=de')
-      .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
-      .then(function(j){
-        btn.disabled=false; btn.textContent='Abfragen';
-        var rows='';
-        function add(lbl,val){ if(val) rows+=htNetRow(lbl,String(val)); }
-        add('IP', j.ip);
-        add('Hostname', j.hostname);
-        add('Organisation', j.org);
-        add('ISP', j.isp);
-        add('Land', (j.country||'')+(j.country_code?' ('+j.country_code+')':''));
-        add('Region', j.region);
-        add('Stadt', j.city);
-        add('Zeitzone', j.timezone);
-        add('ASN', j.asn);
-        out.innerHTML = rows ? '<div class="net-grid">'+rows+'</div>' : htCard('<span style="color:#888;">Keine Daten</span>');
-      })
-      .catch(function(e){ btn.disabled=false; btn.textContent='Abfragen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler ('+e+')</span>'); });
-  } else {
-    var types = ['A','MX','NS','TXT','AAAA','CNAME'];
-    var results = {};
-    var done = 0;
-    types.forEach(function(type){
-      fetch('https://dns.google/resolve?name='+encodeURIComponent(inp)+'&type='+type)
-        .then(function(r){ return r.json(); })
-        .then(function(j){
-          if(j.Answer && j.Answer.length) results[type]=j.Answer;
-        })
-        .catch(function(){})
-        .then(function(){
-          done++;
-          if(done===types.length) renderDNS(inp, results, out, btn);
-        });
-    });
-  }
-}
-
-function renderDNS(domain, results, out, btn) {
-  btn.disabled=false; btn.textContent='Abfragen';
-  var html='';
-  var order=['A','AAAA','MX','NS','TXT','CNAME'];
-  var labels={'A':'IPv4','AAAA':'IPv6','MX':'Mail (MX)','NS':'Nameserver','TXT':'TXT-Records','CNAME':'CNAME'};
-  order.forEach(function(type){
-    var recs=results[type];
-    if(!recs||!recs.length) return;
-    var vals=recs.map(function(r){
-      var d=r.data.replace(/\.$/, '');
-      return type==='MX'?d.replace(/^\d+\s+/,''):d;
-    }).join('<br>');
-    html+='<div class="net-row wide"><div class="net-lbl">'+(labels[type]||type)+'</div><div class="net-val" style="font-size:13px;font-weight:600;word-break:break-all;line-height:1.7;">'+vals+'</div></div>';
-  });
-  out.innerHTML = html
-    ? '<div class="net-grid"><div class="net-row wide"><div class="net-lbl">Domain</div><div class="net-val" style="font-size:14px;">'+domain+'</div></div>'+html+'</div>'
-    : htCard('<span style="color:#888;">Keine DNS-Eintraege gefunden fuer <b>'+domain+'</b></span>');
+  window.open('https://www.whois.com/whois/' + encodeURIComponent(inp), '_blank');
 }
 
 function htCard(html){ return '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;">'+html+'</div>'; }
