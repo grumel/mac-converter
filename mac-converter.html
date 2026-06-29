@@ -5,149 +5,252 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1e3a5f">
 <link rel="manifest" href="manifest.json">
-<title>MAC-Adress-Konverter</title>
+<title>Netzwerk-Tools</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: "Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #47489a 0%, #3b6bb8 45%, #4a8ec8 100%); display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
-.wrap { width: 100%; max-width: 660px; }
+.wrap { width: 100%; max-width: 680px; }
 h1 { font-size: 22px; font-weight: 700; margin-bottom: 1.2rem; color: #ffffff; letter-spacing: 0.03em; }
-.box { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); border-radius: 12px; padding: 1.3rem; margin-bottom: 0.9rem; backdrop-filter: blur(4px); }
+
+.tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
+.tab { padding: 9px 22px; border-radius: 8px 8px 0 0; border: none; font-size: 15px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); transition: all 0.15s; }
+.tab.active { background: rgba(255,255,255,0.95); color: #1a2535; }
+.tab:hover:not(.active) { background: rgba(255,255,255,0.25); color: #fff; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.box { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); border-radius: 0 12px 12px 12px; padding: 1.3rem; margin-bottom: 0.9rem; backdrop-filter: blur(4px); }
+.box:not(:first-child) { border-radius: 12px; }
 label { font-size: 15px; color: #d8eeff; display: block; margin-bottom: 8px; font-weight: 500; }
-input { width: 100%; font-family: "Courier New", monospace; font-size: 19px; padding: 11px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; outline: none; background: rgba(255,255,255,0.95); color: #1a2535; }
+input { width: 100%; font-family: "Courier New", monospace; font-size: 18px; padding: 10px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; outline: none; background: rgba(255,255,255,0.95); color: #1a2535; }
 input:focus { border-color: #0e8a99; box-shadow: 0 0 0 3px rgba(14,138,153,0.35); }
 input::placeholder { color: #8aaccc; }
-.err { font-size: 15px; color: #ffaaaa; margin-top: 7px; display: none; }
+.err { font-size: 14px; color: #ffaaaa; margin-top: 6px; display: none; }
+
 .vendor { background: rgba(255,255,255,0.95); border-radius: 12px; padding: 1rem 1.3rem; margin-bottom: 0.9rem; display: none; }
-.vendor-lbl { font-size: 12px; color: #0e7585; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.07em; }
+.vendor-lbl { font-size: 11px; color: #0e7585; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.07em; }
 .vendor-val { font-size: 19px; font-weight: 700; color: #1a2535; }
+
 .fmt { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.95); border-radius: 8px; padding: 10px 14px; margin-bottom: 5px; }
-.fmt-lbl { font-size: 14px; color: #0e7585; width: 210px; flex-shrink: 0; font-weight: 600; }
-.fmt-val { font-family: "Courier New", monospace; font-size: 17px; color: #1a2535; flex: 1; user-select: all; font-weight: 700; }
-.copy { font-size: 13px; padding: 5px 13px; border: 1px solid #b0c8e0; border-radius: 5px; background: #f0f6ff; color: #3a6090; cursor: pointer; flex-shrink: 0; }
-.copy:hover { background: #ddeeff; color: #1a4070; border-color: #7aaad0; }
+.fmt-lbl { font-size: 13px; color: #0e7585; width: 210px; flex-shrink: 0; font-weight: 600; }
+.fmt-val { font-family: "Courier New", monospace; font-size: 16px; color: #1a2535; flex: 1; user-select: all; font-weight: 700; }
+.copy { font-size: 12px; padding: 4px 11px; border: 1px solid #b0c8e0; border-radius: 5px; background: #f0f6ff; color: #3a6090; cursor: pointer; flex-shrink: 0; }
+.copy:hover { background: #ddeeff; color: #1a4070; }
 .copy.ok { color: #1a9050; border-color: #1a9050; background: #e8fff0; }
-.hint { text-align: center; padding: 2.5rem; color: rgba(255,255,255,0.5); font-size: 16px; }
+.hint { text-align: center; padding: 2.5rem; color: rgba(255,255,255,0.5); font-size: 15px; }
+
+.net-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 0; }
+.net-row { background: rgba(255,255,255,0.95); border-radius: 8px; padding: 10px 14px; }
+.net-row.wide { grid-column: 1 / -1; }
+.net-lbl { font-size: 11px; color: #0e7585; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+.net-val { font-family: "Courier New", monospace; font-size: 16px; color: #1a2535; font-weight: 700; }
+.net-sub { font-size: 12px; color: #666; margin-top: 1px; }
+.net-inputs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: end; margin-bottom: 0.9rem; }
+.net-inputs label { margin-bottom: 5px; }
+.slash { font-size: 28px; color: #fff; font-weight: 700; padding-bottom: 8px; text-align: center; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>MAC-Adress-Konverter</h1>
+  <h1>Netzwerk-Tools</h1>
 
-  <div class="box">
-    <label>MAC-Adresse eingeben oder einfügen</label>
-    <input id="inp" type="text" placeholder="z.B. AA:BB:CC:DD:EE:FF oder AABBCCDDEEFF"
-           oninput="run(this.value)"
-           onpaste="var el=this; setTimeout(function(){ run(el.value); }, 10)" />
-    <div class="err" id="err"></div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('mac',this)">MAC-Konverter</button>
+    <button class="tab" onclick="switchTab('net',this)">Netzwerkrechner</button>
   </div>
 
-  <div class="vendor" id="vcard">
-    <div class="vendor-lbl">Hersteller</div>
-    <div class="vendor-val" id="vval"></div>
+  <!-- MAC Tab -->
+  <div id="tab-mac" class="panel active">
+    <div class="box">
+      <label>MAC-Adresse eingeben oder einfügen</label>
+      <input id="mac-inp" type="text" placeholder="z.B. AA:BB:CC:DD:EE:FF oder AABBCCDDEEFF"
+             oninput="runMAC(this.value)"
+             onpaste="var el=this; setTimeout(function(){ runMAC(el.value); }, 10)" />
+      <div class="err" id="mac-err"></div>
+    </div>
+    <div class="vendor" id="vcard">
+      <div class="vendor-lbl">Hersteller</div>
+      <div class="vendor-val" id="vval"></div>
+    </div>
+    <div id="mac-out"></div>
+    <div class="hint" id="mac-hint">MAC-Adresse oben eingeben — alle Formate erscheinen hier</div>
   </div>
 
-  <div id="out"></div>
-
-  <div class="hint" id="hint">MAC-Adresse oben eingeben &mdash; alle Formate erscheinen hier</div>
+  <!-- Netzwerk Tab -->
+  <div id="tab-net" class="panel">
+    <div class="box">
+      <div class="net-inputs">
+        <div>
+          <label>IP-Adresse</label>
+          <input id="net-ip" type="text" placeholder="192.168.1.100"
+                 oninput="runNet()"
+                 onpaste="setTimeout(runNet, 10)" />
+        </div>
+        <div class="slash">/</div>
+        <div>
+          <label>Präfix / Maske</label>
+          <input id="net-mask" type="text" placeholder="24 oder 255.255.255.0"
+                 oninput="runNet()"
+                 onpaste="setTimeout(runNet, 10)" />
+        </div>
+      </div>
+      <div class="err" id="net-err"></div>
+    </div>
+    <div id="net-out"></div>
+    <div class="hint" id="net-hint">IP-Adresse und Subnetzmaske eingeben</div>
+  </div>
 </div>
 
 <script>
-var FMTS = [
-  ["IEEE 802",             function(b){ return b.join(':'); }],
-  ["Windows (Bindestrich)", function(b){ return b.map(function(x){return x.toUpperCase();}).join('-'); }],
-  ["Ohne Trennzeichen",    function(b){ return b.map(function(x){return x.toUpperCase();}).join(''); }],
-  ["Cisco (Gruppen à 4)", function(b){ var h=b.join('').toUpperCase(); return h.slice(0,4)+'.'+h.slice(4,8)+'.'+h.slice(8); }]
-];
+/* ── Tab-Steuerung ── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
 
-function parse(raw) {
-  var s = raw.replace(/[^0-9a-fA-F]/g, '');
+/* ══════════════════════════════
+   MAC-KONVERTER
+══════════════════════════════ */
+var MAC_FMTS = [
+  ["IEEE 802",              function(b){ return b.join(':'); }],
+  ["Windows (Bindestrich)", function(b){ return b.map(u).join('-'); }],
+  ["Ohne Trennzeichen",     function(b){ return b.map(u).join(''); }],
+  ["Cisco (Gruppen à 4)",  function(b){ var h=b.join('').toUpperCase(); return h.slice(0,4)+'.'+h.slice(4,8)+'.'+h.slice(8); }]
+];
+function u(x){ return x.toUpperCase(); }
+
+function parseMAC(raw) {
+  var s = raw.replace(/[^0-9a-fA-F]/g,'');
   if (s.length !== 12) return null;
-  var b = [];
-  for (var i = 0; i < 12; i += 2) b.push(s.slice(i, i+2).toLowerCase());
+  var b=[]; for(var i=0;i<12;i+=2) b.push(s.slice(i,i+2).toLowerCase());
   return b;
 }
 
 var vendorTimer = null;
-
-function run(val) {
-  var err = document.getElementById('err');
-  var out = document.getElementById('out');
-  var hint = document.getElementById('hint');
-  var vcard = document.getElementById('vcard');
-  var vval = document.getElementById('vval');
-
-  if (!val || val.trim() === '') {
-    err.style.display = 'none';
-    out.innerHTML = '';
-    hint.style.display = 'block';
-    vcard.style.display = 'none';
-    return;
+function runMAC(val) {
+  var err=document.getElementById('mac-err'), out=document.getElementById('mac-out'),
+      hint=document.getElementById('mac-hint'), vcard=document.getElementById('vcard'),
+      vval=document.getElementById('vval');
+  if (!val||val.trim()==='') { err.style.display='none'; out.innerHTML=''; hint.style.display='block'; vcard.style.display='none'; return; }
+  var b=parseMAC(val);
+  if (!b) { err.textContent='Keine gültige MAC-Adresse — bitte 12 Hex-Zeichen eingeben.'; err.style.display='block'; out.innerHTML=''; hint.style.display='none'; vcard.style.display='none'; return; }
+  err.style.display='none'; hint.style.display='none';
+  var html='';
+  for(var i=0;i<MAC_FMTS.length;i++){
+    var v=MAC_FMTS[i][1](b);
+    html+='<div class="fmt"><span class="fmt-lbl">'+MAC_FMTS[i][0]+'</span><span class="fmt-val" id="mv'+i+'">'+v+'</span><button class="copy" onclick="cp(\'mv'+i+'\',this)">Kopieren</button></div>';
   }
-
-  var b = parse(val);
-  if (!b) {
-    err.textContent = 'Keine gültige MAC-Adresse — bitte 12 Hex-Zeichen eingeben.';
-    err.style.display = 'block';
-    out.innerHTML = '';
-    hint.style.display = 'none';
-    vcard.style.display = 'none';
-    return;
-  }
-
-  err.style.display = 'none';
-  hint.style.display = 'none';
-
-  var html = '';
-  for (var i = 0; i < FMTS.length; i++) {
-    var v = FMTS[i][1](b);
-    html += '<div class="fmt">'
-      + '<span class="fmt-lbl">' + FMTS[i][0] + '</span>'
-      + '<span class="fmt-val" id="v' + i + '">' + v + '</span>'
-      + '<button class="copy" onclick="cp(' + i + ')">Kopieren</button>'
-      + '</div>';
-  }
-  out.innerHTML = html;
-
-  vval.textContent = '…';
-  vcard.style.display = 'block';
-
+  out.innerHTML=html;
+  vval.textContent='…'; vcard.style.display='block';
   clearTimeout(vendorTimer);
-  vendorTimer = setTimeout(function() {
-    var mac = b.map(function(x){ return x.toUpperCase(); }).join(':');
-    var url = 'https://api.macvendors.com/' + encodeURIComponent(mac);
-    fetch('https://corsproxy.io/?' + encodeURIComponent(url))
-      .then(function(r) {
-        if (r.status === 404) { vval.textContent = 'Unbekannt'; return; }
-        if (!r.ok) { vval.textContent = 'Unbekannt'; return; }
-        return r.text().then(function(t) { vval.textContent = t.trim() || 'Unbekannt'; });
-      })
-      .catch(function() { vval.textContent = 'Abfrage fehlgeschlagen'; });
-  }, 500);
+  vendorTimer=setTimeout(function(){
+    var mac=b.map(u).join(':');
+    var url='https://api.macvendors.com/'+encodeURIComponent(mac);
+    fetch('https://corsproxy.io/?'+encodeURIComponent(url))
+      .then(function(r){ return r.status===404?'Unbekannt':(r.ok?r.text():Promise.reject()); })
+      .then(function(t){ vval.textContent=(t||'').trim()||'Unbekannt'; })
+      .catch(function(){ vval.textContent='Abfrage fehlgeschlagen'; });
+  },500);
 }
 
-function cp(i) {
-  var val = document.getElementById('v' + i).textContent;
-  var btn = document.querySelectorAll('.copy')[i];
+/* ══════════════════════════════
+   NETZWERKRECHNER
+══════════════════════════════ */
+function parseIP(s) {
+  var p=s.trim().split('.');
+  if(p.length!==4) return null;
+  var n=0;
+  for(var i=0;i<4;i++){
+    var x=parseInt(p[i],10);
+    if(isNaN(x)||x<0||x>255) return null;
+    n=(n<<8)|x;
+  }
+  return n>>>0;
+}
+
+function ip2str(n) {
+  return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+}
+
+function parseMask(s) {
+  s=s.trim();
+  if(/^\d+$/.test(s)){
+    var p=parseInt(s,10);
+    if(p<0||p>32) return null;
+    return p===0?0:(0xFFFFFFFF<<(32-p))>>>0;
+  }
+  var m=parseIP(s);
+  if(m===null) return null;
+  var inv=~m>>>0;
+  if((inv&(inv+1))!==0) return null;
+  return m;
+}
+
+function maskToCidr(m) {
+  var n=0, x=m;
+  while(x){ n+=x&1; x>>>=1; }
+  return n;
+}
+
+function ipClass(ip) {
+  var f=(ip>>>24)&255;
+  if(f<128) return 'A'; if(f<192) return 'B'; if(f<224) return 'C';
+  if(f<240) return 'D (Multicast)'; return 'E (Reserviert)';
+}
+
+function runNet() {
+  var ipEl=document.getElementById('net-ip'), maskEl=document.getElementById('net-mask'),
+      err=document.getElementById('net-err'), out=document.getElementById('net-out'),
+      hint=document.getElementById('net-hint');
+  var ipStr=ipEl.value.trim(), maskStr=maskEl.value.trim();
+  if(!ipStr&&!maskStr){ err.style.display='none'; out.innerHTML=''; hint.style.display='block'; return; }
+  hint.style.display='none';
+  var ip=parseIP(ipStr);
+  if(ip===null&&ipStr){ err.textContent='Ungültige IP-Adresse.'; err.style.display='block'; out.innerHTML=''; return; }
+  var mask=maskStr?parseMask(maskStr):null;
+  if(mask===null&&maskStr){ err.textContent='Ungültige Subnetzmaske / Präfix.'; err.style.display='block'; out.innerHTML=''; return; }
+  err.style.display='none';
+  if(ip===null||mask===null){ out.innerHTML=''; return; }
+
+  var cidr=maskToCidr(mask);
+  var network=(ip&mask)>>>0;
+  var broadcast=(network|(~mask>>>0))>>>0;
+  var wildcard=(~mask)>>>0;
+  var hosts=cidr>=31?Math.pow(2,32-cidr):Math.pow(2,32-cidr)-2;
+  var first=cidr>=31?network:(network+1)>>>0;
+  var last=cidr>=31?broadcast:(broadcast-1)>>>0;
+
+  function row(lbl,val,sub,wide){
+    return '<div class="net-row'+(wide?' wide':'')+'"><div class="net-lbl">'+lbl+'</div><div class="net-val">'+val+'</div>'+(sub?'<div class="net-sub">'+sub+'</div>':'')+'</div>';
+  }
+
+  out.innerHTML='<div class="net-grid">'
+    +row('Netzwerkadresse', ip2str(network)+'/'+cidr, '', true)
+    +row('Subnetzmaske', ip2str(mask), '')
+    +row('Wildcard-Maske', ip2str(wildcard), '')
+    +row('Broadcast', ip2str(broadcast), '')
+    +row('Erster Host', ip2str(first), '')
+    +row('Letzter Host', ip2str(last), '')
+    +row('Nutzbare Hosts', hosts.toLocaleString('de'), '')
+    +row('IP-Klasse', ipClass(ip), '')
+    +row('Eingegebene IP', ip2str(ip), cidr<32?('Hostanteil: '+ip2str((ip&wildcard)>>>0)):'')
+  +'</div>';
+}
+
+/* ── Kopieren ── */
+function cp(id, btn) {
+  var val=document.getElementById(id).textContent;
   try {
-    var ta = document.createElement('textarea');
-    ta.value = val;
-    ta.style.position = 'fixed';
-    ta.style.top = '-9999px';
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent = '✓ Kopiert';
-    btn.className = 'copy ok';
-    setTimeout(function(){ btn.textContent = 'Kopieren'; btn.className = 'copy'; }, 1500);
-  } catch(e) {}
+    var ta=document.createElement('textarea'); ta.value=val; ta.style.position='fixed'; ta.style.top='-9999px';
+    document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    btn.textContent='✓ Kopiert'; btn.className='copy ok';
+    setTimeout(function(){ btn.textContent='Kopieren'; btn.className='copy'; },1500);
+  } catch(e){}
 }
 </script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
-}
-</script>
+<script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }</script>
 </body>
 </html>
