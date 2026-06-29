@@ -489,7 +489,8 @@ function doWhois() {
   out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Whois wird abgefragt...</div>';
   btn.disabled = true; btn.textContent = '...';
   var isIP = /^[\d.]+$/.test(inp);
-  var url = isIP ? 'https://rdap.org/ip/'+encodeURIComponent(inp) : 'https://rdap.org/domain/'+encodeURIComponent(inp);
+  var rdap = isIP ? 'https://rdap.org/ip/'+encodeURIComponent(inp) : 'https://rdap.org/domain/'+encodeURIComponent(inp);
+  var url = 'https://corsproxy.io/?'+encodeURIComponent(rdap);
   fetch(url)
     .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
     .then(function(j){
