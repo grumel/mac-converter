@@ -137,9 +137,9 @@ input::placeholder { color: #8aaccc; }
     <div class="box">
       <label>Öffentliche IP-Adresse</label>
       <input id="rdns-inp" type="text" placeholder="z.B. 8.8.8.8"
-             onkeydown="if(event.key==='Enter') doHT('rdns')" />
+             onkeydown="if(event.key==='Enter') doRdns()" />
       <div style="margin-top:0.8rem;">
-        <button id="rdns-btn" onclick="doHT('rdns')" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Nachschlagen</button>
+        <button id="rdns-btn" onclick="doRdns()" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Nachschlagen</button>
       </div>
     </div>
     <div id="rdns-out"></div>
@@ -150,9 +150,9 @@ input::placeholder { color: #8aaccc; }
     <div class="box">
       <label>Domain oder IP-Adresse</label>
       <input id="whois-inp" type="text" placeholder="z.B. example.com oder 8.8.8.8"
-             onkeydown="if(event.key==='Enter') doHT('whois')" />
+             onkeydown="if(event.key==='Enter') doWhois()" />
       <div style="margin-top:0.8rem;">
-        <button id="whois-btn" onclick="doHT('whois')" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Abfragen</button>
+        <button id="whois-btn" onclick="doWhois()" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Abfragen</button>
       </div>
     </div>
     <div id="whois-out"></div>
@@ -458,42 +458,81 @@ function runPort(val) {
    REVERSE DNS / WHOIS
    Gemeinsame HackerTarget-Hilfsfunktion
 ══════════════════════════════ */
-var HT_CFG = {
-  rdns:  { api: 'reversedns',  label: 'Reverse DNS' },
-  whois: { api: 'whois',       label: 'Whois'       }
-};
-
-function doHT(name) {
-  var cfg  = HT_CFG[name];
-  var inp  = document.getElementById(name+'-inp').value.trim();
-  var out  = document.getElementById(name+'-out');
-  var btn  = document.getElementById(name+'-btn');
+/* REVERSE DNS via Google DNS-over-HTTPS */
+function doRdns() {
+  var inp = document.getElementById('rdns-inp').value.trim();
+  var out = document.getElementById('rdns-out');
+  var btn = document.getElementById('rdns-btn');
   if (!inp) return;
-
-  out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">'+cfg.label+' wird abgefragt…</div>';
-  btn.disabled = true; btn.textContent = '…';
-
-  var url = 'https://api.hackertarget.com/'+cfg.api+'/?q='+encodeURIComponent(inp);
-  fetch(url)
-    .then(function(r){ return r.ok ? r.text() : Promise.reject(r.status); })
-    .then(function(txt){
-      btn.disabled = false; btn.textContent = btn.dataset.label || btn.textContent.replace('…', cfg.label);
-      // restore button label from original HTML
-      btn.textContent = ({rdns:'Nachschlagen', whois:'Abfragen'})[name];
-
-      var isError = /^error|api count/i.test(txt.trim());
-      out.innerHTML = '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;">'
-        + (isError
-            ? '<div style="color:#c0392b;font-weight:700;">Fehler</div><pre style="font-size:13px;color:#445;white-space:pre-wrap;margin-top:6px;">'+txt+'</pre>'
-            : '<pre style="font-family:\'Courier New\',monospace;font-size:13px;color:#1a2535;white-space:pre-wrap;line-height:1.6;">'+txt+'</pre>')
-        + '</div>';
+  var ip = parseIP(inp);
+  if (ip === null) { out.innerHTML = htCard('<span style="color:#c0392b;font-weight:700;">Ungueltige IP-Adresse</span>'); return; }
+  var ptr = [(ip&255),(ip>>>8&255),(ip>>>16&255),(ip>>>24&255)].join('.')+'.in-addr.arpa';
+  out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Wird aufgeloest...</div>';
+  btn.disabled = true; btn.textContent = '...';
+  fetch('https://dns.google/resolve?name='+encodeURIComponent(ptr)+'&type=PTR')
+    .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
+    .then(function(j){
+      btn.disabled=false; btn.textContent='Nachschlagen';
+      if(!j.Answer||!j.Answer.length){ out.innerHTML=htCard('<div style="color:#888;">Kein PTR-Eintrag fuer <b>'+inp+'</b></div>'); return; }
+      var rows=htNetRow('IP',inp)+j.Answer.map(function(a){ return htNetRow('PTR',a.data.replace(/\.$/,'')); }).join('');
+      out.innerHTML='<div class="net-grid">'+rows+'</div>';
     })
-    .catch(function(e){
-      btn.disabled = false;
-      btn.textContent = ({rdns:'Nachschlagen', whois:'Abfragen'})[name];
-      out.innerHTML = '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;color:#c0392b;font-weight:700;">Abfrage fehlgeschlagen ('+e+')</div>';
-    });
+    .catch(function(e){ btn.disabled=false; btn.textContent='Nachschlagen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler ('+e+')</span>'); });
 }
+
+/* WHOIS via RDAP (rdap.org) */
+function doWhois() {
+  var inp = document.getElementById('whois-inp').value.trim();
+  var out = document.getElementById('whois-out');
+  var btn = document.getElementById('whois-btn');
+  if (!inp) return;
+  out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Whois wird abgefragt...</div>';
+  btn.disabled = true; btn.textContent = '...';
+  var isIP = /^[\d.]+$/.test(inp);
+  var url = isIP ? 'https://rdap.org/ip/'+encodeURIComponent(inp) : 'https://rdap.org/domain/'+encodeURIComponent(inp);
+  fetch(url)
+    .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
+    .then(function(j){
+      btn.disabled=false; btn.textContent='Abfragen';
+      var rows='';
+      function add(lbl,val){ if(val) rows+=htNetRow(lbl,val); }
+      function vcFn(e){ var v=((e.vcardArray||[])[1]||[]).find(function(x){return x[0]==='fn';}); return v?v[3]:''; }
+      if(isIP){
+        add('IP-Block',(j.startAddress||'')+(j.endAddress?' - '+j.endAddress:''));
+        add('Name',j.name); add('Land',j.country);
+        (j.entities||[]).forEach(function(e){
+          var fn=vcFn(e);
+          if(fn) add((e.roles||[]).join('/')  ,fn);
+        });
+        (j.events||[]).forEach(function(ev){
+          var d=ev.eventDate?ev.eventDate.slice(0,10):'';
+          if(ev.eventAction==='registration') add('Registriert',d);
+          if(ev.eventAction==='last changed') add('Geaendert',d);
+        });
+        add('Status',(j.status||[]).join(', '));
+      } else {
+        add('Domain',j.ldhName||j.unicodeName||inp);
+        var reg=(j.entities||[]).find(function(e){return(e.roles||[]).indexOf('registrar')!==-1;});
+        if(reg){ add('Registrar',vcFn(reg)||reg.handle); add('IANA-ID',reg.handle); }
+        var own=(j.entities||[]).find(function(e){return(e.roles||[]).indexOf('registrant')!==-1;});
+        if(own){ add('Inhaber',vcFn(own)); }
+        (j.events||[]).forEach(function(ev){
+          var d=ev.eventDate?ev.eventDate.slice(0,10):'';
+          if(ev.eventAction==='registration') add('Registriert',d);
+          if(ev.eventAction==='expiration')   add('Laeuft ab',d);
+          if(ev.eventAction==='last changed') add('Geaendert',d);
+        });
+        add('Status',(j.status||[]).join(', '));
+        add('DNSSEC',j.secureDNS?(j.secureDNS.delegationSigned?'Ja':'Nein'):'');
+        add('Nameserver',(j.nameservers||[]).map(function(n){return n.ldhName;}).join(', '));
+      }
+      out.innerHTML = rows ? '<div class="net-grid">'+rows+'</div>' : htCard('<span style="color:#888;">Keine Daten</span>');
+    })
+    .catch(function(e){ btn.disabled=false; btn.textContent='Abfragen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler - Domain/IP pruefen ('+e+')</span>'); });
+}
+
+function htCard(html){ return '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;">'+html+'</div>'; }
+function htNetRow(lbl,val){ return '<div class="net-row wide"><div class="net-lbl">'+lbl+'</div><div class="net-val" style="font-size:14px;word-break:break-all;">'+val+'</div></div>'; }
 
 /* ── Kopieren ── */
 function cp(id, btn) {
