@@ -3,29 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#3a7bd5">
+<meta name="theme-color" content="#1e3a5f">
 <link rel="manifest" href="manifest.json">
 <title>MAC-Adress-Konverter</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Segoe UI", Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 2rem 1rem; }
-.wrap { width: 100%; max-width: 600px; }
-h1 { font-size: 17px; font-weight: 600; margin-bottom: 1rem; color: #1a1a1a; }
-.box { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 0.6rem; }
-label { font-size: 12px; color: #666; display: block; margin-bottom: 5px; }
-input { width: 100%; font-family: "Courier New", monospace; font-size: 15px; padding: 8px; border: 1px solid #ccc; border-radius: 5px; outline: none; }
-input:focus { border-color: #3a7bd5; box-shadow: 0 0 0 2px rgba(58,123,213,0.2); }
-.err { font-size: 12px; color: #c0392b; margin-top: 5px; display: none; }
-.vendor { background: #e8f4fd; border: 1px solid #a8cce8; border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 0.6rem; display: none; }
-.vendor-lbl { font-size: 11px; color: #1a5276; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
-.vendor-val { font-size: 15px; font-weight: 600; color: #154360; }
-.fmt { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #e0e0e0; border-radius: 5px; padding: 7px 10px; margin-bottom: 3px; }
-.fmt-lbl { font-size: 11px; color: #999; width: 200px; flex-shrink: 0; }
-.fmt-val { font-family: "Courier New", monospace; font-size: 13px; color: #1a1a1a; flex: 1; user-select: all; }
-.copy { font-size: 11px; padding: 3px 9px; border: 1px solid #bbb; border-radius: 4px; background: #fff; cursor: pointer; flex-shrink: 0; }
-.copy:hover { background: #f0f0f0; }
-.copy.ok { color: #27ae60; border-color: #27ae60; }
-.hint { text-align: center; padding: 2rem; color: #bbb; font-size: 13px; }
+body { font-family: "Segoe UI", Arial, sans-serif; background: #1e3a5f; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
+.wrap { width: 100%; max-width: 640px; }
+h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.2rem; color: #d6e8ff; }
+.box { background: #253f63; border: 1px solid #3a5f8f; border-radius: 10px; padding: 1.2rem; margin-bottom: 0.8rem; }
+label { font-size: 14px; color: #9bbcdf; display: block; margin-bottom: 7px; }
+input { width: 100%; font-family: "Courier New", monospace; font-size: 17px; padding: 10px; border: 1px solid #3a5f8f; border-radius: 6px; outline: none; background: #1a3050; color: #e8f4ff; }
+input:focus { border-color: #5b9bd5; box-shadow: 0 0 0 2px rgba(91,155,213,0.3); }
+input::placeholder { color: #4a6f99; }
+.err { font-size: 14px; color: #f08080; margin-top: 6px; display: none; }
+.vendor { background: #1a3a5c; border: 1px solid #3a6090; border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; display: none; }
+.vendor-lbl { font-size: 12px; color: #7aaed6; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.05em; }
+.vendor-val { font-size: 17px; font-weight: 600; color: #c8e4ff; }
+.fmt { display: flex; align-items: center; gap: 10px; background: #253f63; border: 1px solid #3a5a88; border-radius: 6px; padding: 9px 12px; margin-bottom: 4px; }
+.fmt-lbl { font-size: 13px; color: #7aaed6; width: 200px; flex-shrink: 0; }
+.fmt-val { font-family: "Courier New", monospace; font-size: 15px; color: #e8f4ff; flex: 1; user-select: all; }
+.copy { font-size: 13px; padding: 4px 12px; border: 1px solid #4a7aaa; border-radius: 5px; background: #1a3050; color: #9bbcdf; cursor: pointer; flex-shrink: 0; }
+.copy:hover { background: #2a4a70; color: #c8e4ff; }
+.copy.ok { color: #5dbb7a; border-color: #5dbb7a; }
+.hint { text-align: center; padding: 2.5rem; color: #4a6f99; font-size: 15px; }
 </style>
 </head>
 <body>
@@ -33,14 +34,10 @@ input:focus { border-color: #3a7bd5; box-shadow: 0 0 0 2px rgba(58,123,213,0.2);
   <h1>MAC-Adress-Konverter</h1>
 
   <div class="box">
-    <label>MAC-Adresse eingeben oder einfügen, dann auf Konvertieren klicken</label>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <input id="inp" type="text" placeholder="z.B. AA:BB:CC:DD:EE:FF oder AABBCCDDEEFF"
-             onkeydown="if(event.key==='Enter')run(this.value)"
-             style="flex:1;" />
-      <button onclick="run(document.getElementById('inp').value)" style="background:#3a7bd5;color:#fff;border-color:#2a6bc5;font-weight:600;padding:8px 16px;">Konvertieren</button>
-      <button onclick="document.getElementById('inp').value='';run('')">✕</button>
-    </div>
+    <label>MAC-Adresse eingeben oder einfügen</label>
+    <input id="inp" type="text" placeholder="z.B. AA:BB:CC:DD:EE:FF oder AABBCCDDEEFF"
+           oninput="run(this.value)"
+           onpaste="var el=this; setTimeout(function(){ run(el.value); }, 10)" />
     <div class="err" id="err"></div>
   </div>
 
@@ -135,9 +132,14 @@ function run(val) {
   hint.style.display = 'none';
 
   var key = b.slice(0,3).map(function(x){return x.toUpperCase();}).join('');
-  var vendor = OUI[key] || 'Unbekannt / Nicht in Datenbank';
-  vval.textContent = vendor;
+  var localVendor = OUI[key] || null;
+  vval.textContent = localVendor || '…';
   vcard.style.display = 'block';
+  var mac = b.map(function(x){return x.toUpperCase();}).join(':');
+  fetch('https://api.macvendors.com/' + encodeURIComponent(mac))
+    .then(function(r){ return r.ok ? r.text() : null; })
+    .then(function(t){ vval.textContent = (t && t.trim()) ? t.trim() : (localVendor || 'Unbekannt'); })
+    .catch(function(){ if (!localVendor) vval.textContent = 'Unbekannt'; });
 
   var html = '';
   for (var i = 0; i < FMTS.length; i++) {
