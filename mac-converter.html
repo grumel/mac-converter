@@ -519,9 +519,14 @@ function doWhois() {
     var base = RDAP_TLD[tld2] || RDAP_TLD[tld1] || 'https://rdap.org/domain/';
     rdap = base + encodeURIComponent(inp);
   }
-  var url = isIP ? rdap : 'https://corsproxy.io/?'+encodeURIComponent(rdap);
+  var url = isIP ? rdap : 'https://api.allorigins.win/get?url='+encodeURIComponent(rdap);
   fetch(url)
     .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
+    .then(function(wrap){
+      var j = isIP ? wrap : JSON.parse(wrap.contents);
+      if(!j) return Promise.reject('leer');
+      return Promise.resolve(j);
+    })
     .then(function(j){
       btn.disabled=false; btn.textContent='Abfragen';
       var rows='';
