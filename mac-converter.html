@@ -74,7 +74,7 @@ input::placeholder { color: #8aaccc; }
     <button class="tab" onclick="switchTab('net',this)">Netzwerkrechner</button>
     <button class="tab" onclick="switchTab('port',this)">Port-Suche</button>
     <button class="tab" onclick="switchTab('rdns',this)">Reverse DNS</button>
-    <button class="tab" onclick="switchTab('whois',this)">Whois</button>
+    <button class="tab" onclick="switchTab('whois',this)">Domain/IP Info</button>
   </div>
 
   <!-- MAC Tab -->
@@ -145,11 +145,11 @@ input::placeholder { color: #8aaccc; }
     <div id="rdns-out"></div>
   </div>
 
-  <!-- Whois Tab -->
+  <!-- Domain/IP Info Tab -->
   <div id="tab-whois" class="panel">
     <div class="box">
       <label>Domain oder IP-Adresse</label>
-      <input id="whois-inp" type="text" placeholder="z.B. example.com oder 8.8.8.8"
+      <input id="whois-inp" type="text" placeholder="z.B. netzblitz.de oder 8.8.8.8"
              onkeydown="if(event.key==='Enter') doWhois()" />
       <div style="margin-top:0.8rem;">
         <button id="whois-btn" onclick="doWhois()" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Abfragen</button>
@@ -480,90 +480,72 @@ function doRdns() {
     .catch(function(e){ btn.disabled=false; btn.textContent='Nachschlagen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler ('+e+')</span>'); });
 }
 
-/* WHOIS via RDAP – TLD-spezifische Server */
-var RDAP_TLD = {
-  'de':'https://rdap.denic.de/domain/',
-  'at':'https://rdap.nic.at/domain/',
-  'ch':'https://rdap.nic.ch/domain/',
-  'li':'https://rdap.nic.ch/domain/',
-  'com':'https://rdap.verisign.com/com/v1/domain/',
-  'net':'https://rdap.verisign.com/net/v1/domain/',
-  'org':'https://rdap.publicinterestregistry.org/rdap/domain/',
-  'io':'https://rdap.nic.io/domain/',
-  'eu':'https://rdap.eu/domain/',
-  'fr':'https://rdap.nic.fr/domain/',
-  'nl':'https://rdap.nic.nl/domain/',
-  'uk':'https://rdap.nominet.uk/uk/domain/',
-  'co.uk':'https://rdap.nominet.uk/uk/domain/',
-  'info':'https://rdap.afilias.info/rdap/info/domain/',
-  'biz':'https://rdap.afilias.info/rdap/biz/domain/',
-  'app':'https://rdap.nic.google/domain/',
-  'dev':'https://rdap.nic.google/domain/',
-};
-
+/* Domain/IP Info – DNS via Cloudflare DoH + IP-Info via ipwhois.app */
 function doWhois() {
   var inp = document.getElementById('whois-inp').value.trim();
   var out = document.getElementById('whois-out');
   var btn = document.getElementById('whois-btn');
   if (!inp) return;
-  out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Whois wird abgefragt...</div>';
+  out.innerHTML = '<div class="hint" style="color:rgba(255,255,255,0.7);">Wird abgefragt...</div>';
   btn.disabled = true; btn.textContent = '...';
+
   var isIP = /^[\d.]+$/.test(inp);
-  var rdap;
+
   if (isIP) {
-    rdap = 'https://rdap.arin.net/registry/ip/'+encodeURIComponent(inp);
+    fetch('https://ipwhois.app/json/'+encodeURIComponent(inp)+'?lang=de')
+      .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
+      .then(function(j){
+        btn.disabled=false; btn.textContent='Abfragen';
+        var rows='';
+        function add(lbl,val){ if(val) rows+=htNetRow(lbl,String(val)); }
+        add('IP', j.ip);
+        add('Hostname', j.hostname);
+        add('Organisation', j.org);
+        add('ISP', j.isp);
+        add('Land', (j.country||'')+(j.country_code?' ('+j.country_code+')':''));
+        add('Region', j.region);
+        add('Stadt', j.city);
+        add('Zeitzone', j.timezone);
+        add('ASN', j.asn);
+        out.innerHTML = rows ? '<div class="net-grid">'+rows+'</div>' : htCard('<span style="color:#888;">Keine Daten</span>');
+      })
+      .catch(function(e){ btn.disabled=false; btn.textContent='Abfragen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler ('+e+')</span>'); });
   } else {
-    var parts = inp.toLowerCase().split('.');
-    var tld2 = parts.slice(-2).join('.');
-    var tld1 = parts[parts.length-1];
-    var base = RDAP_TLD[tld2] || RDAP_TLD[tld1] || 'https://rdap.org/domain/';
-    rdap = base + encodeURIComponent(inp);
+    var types = ['A','MX','NS','TXT','AAAA','CNAME'];
+    var results = {};
+    var done = 0;
+    types.forEach(function(type){
+      fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(inp)+'&type='+type, {headers:{Accept:'application/dns-json'}})
+        .then(function(r){ return r.json(); })
+        .then(function(j){
+          if(j.Answer && j.Answer.length) results[type]=j.Answer;
+        })
+        .catch(function(){})
+        .then(function(){
+          done++;
+          if(done===types.length) renderDNS(inp, results, out, btn);
+        });
+    });
   }
-  var url = isIP ? rdap : 'https://api.allorigins.win/get?url='+encodeURIComponent(rdap);
-  fetch(url)
-    .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
-    .then(function(wrap){
-      var j = isIP ? wrap : JSON.parse(wrap.contents);
-      if(!j) return Promise.reject('leer');
-      return Promise.resolve(j);
-    })
-    .then(function(j){
-      btn.disabled=false; btn.textContent='Abfragen';
-      var rows='';
-      function add(lbl,val){ if(val) rows+=htNetRow(lbl,val); }
-      function vcFn(e){ var v=((e.vcardArray||[])[1]||[]).find(function(x){return x[0]==='fn';}); return v?v[3]:''; }
-      if(isIP){
-        add('IP-Block',(j.startAddress||'')+(j.endAddress?' - '+j.endAddress:''));
-        add('Name',j.name); add('Land',j.country);
-        (j.entities||[]).forEach(function(e){
-          var fn=vcFn(e);
-          if(fn) add((e.roles||[]).join('/')  ,fn);
-        });
-        (j.events||[]).forEach(function(ev){
-          var d=ev.eventDate?ev.eventDate.slice(0,10):'';
-          if(ev.eventAction==='registration') add('Registriert',d);
-          if(ev.eventAction==='last changed') add('Geaendert',d);
-        });
-        add('Status',(j.status||[]).join(', '));
-      } else {
-        add('Domain',j.ldhName||j.unicodeName||inp);
-        var reg=(j.entities||[]).find(function(e){return(e.roles||[]).indexOf('registrar')!==-1;});
-        if(reg){ add('Registrar',vcFn(reg)||reg.handle); add('IANA-ID',reg.handle); }
-        var own=(j.entities||[]).find(function(e){return(e.roles||[]).indexOf('registrant')!==-1;});
-        if(own){ add('Inhaber',vcFn(own)); }
-        (j.events||[]).forEach(function(ev){
-          var d=ev.eventDate?ev.eventDate.slice(0,10):'';
-          if(ev.eventAction==='registration') add('Registriert',d);
-          if(ev.eventAction==='expiration')   add('Laeuft ab',d);
-          if(ev.eventAction==='last changed') add('Geaendert',d);
-        });
-        add('Status',(j.status||[]).join(', '));
-        add('DNSSEC',j.secureDNS?(j.secureDNS.delegationSigned?'Ja':'Nein'):'');
-        add('Nameserver',(j.nameservers||[]).map(function(n){return n.ldhName;}).join(', '));
-      }
-      out.innerHTML = rows ? '<div class="net-grid">'+rows+'</div>' : htCard('<span style="color:#888;">Keine Daten</span>');
-    })
-    .catch(function(e){ btn.disabled=false; btn.textContent='Abfragen'; out.innerHTML=htCard('<span style="color:#c0392b;font-weight:700;">Fehler - Domain/IP pruefen ('+e+')</span>'); });
+}
+
+function renderDNS(domain, results, out, btn) {
+  btn.disabled=false; btn.textContent='Abfragen';
+  var html='';
+  var order=['A','AAAA','MX','NS','TXT','CNAME'];
+  var labels={'A':'IPv4','AAAA':'IPv6','MX':'Mail (MX)','NS':'Nameserver','TXT':'TXT-Records','CNAME':'CNAME'};
+  order.forEach(function(type){
+    var recs=results[type];
+    if(!recs||!recs.length) return;
+    var vals=recs.map(function(r){
+      var d=r.data.replace(/\.$/, '');
+      return type==='MX'?d.replace(/^\d+\s+/,''):d;
+    }).join('<br>');
+    html+='<div class="net-row wide"><div class="net-lbl">'+(labels[type]||type)+'</div><div class="net-val" style="font-size:13px;font-weight:600;word-break:break-all;line-height:1.7;">'+vals+'</div></div>';
+  });
+  out.innerHTML = html
+    ? '<div class="net-grid"><div class="net-row wide"><div class="net-lbl">Domain</div><div class="net-val" style="font-size:14px;">'+domain+'</div></div>'+html+'</div>'
+    : htCard('<span style="color:#888;">Keine DNS-Eintraege gefunden fuer <b>'+domain+'</b></span>');
 }
 
 function htCard(html){ return '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;">'+html+'</div>'; }
