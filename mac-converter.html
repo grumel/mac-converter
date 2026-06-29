@@ -113,11 +113,13 @@ function run(val) {
 
   clearTimeout(vendorTimer);
   vendorTimer = setTimeout(function() {
-    var oui = b.slice(0,3).map(function(x){ return x.toUpperCase(); }).join(':');
-    fetch('https://api.maclookup.app/v2/macs/' + oui)
-      .then(function(r) { return r.json(); })
-      .then(function(j) {
-        vval.textContent = (j && j.company && j.company !== '') ? j.company : 'Unbekannt';
+    var mac = b.map(function(x){ return x.toUpperCase(); }).join(':');
+    var url = 'https://api.macvendors.com/' + encodeURIComponent(mac);
+    fetch('https://corsproxy.io/?' + encodeURIComponent(url))
+      .then(function(r) {
+        if (r.status === 404) { vval.textContent = 'Unbekannt'; return; }
+        if (!r.ok) { vval.textContent = 'Unbekannt'; return; }
+        return r.text().then(function(t) { vval.textContent = t.trim() || 'Unbekannt'; });
       })
       .catch(function() { vval.textContent = 'Abfrage fehlgeschlagen'; });
   }, 500);
