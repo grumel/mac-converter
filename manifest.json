@@ -3,13 +3,20 @@
   "short_name": "Netzwerk",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f0f2f5",
+  "background_color": "#47489a",
   "theme_color": "#3a7bd5",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%233a7bd5'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='monospace' font-weight='bold'>M</text></svg>",
+      "src": "icon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }

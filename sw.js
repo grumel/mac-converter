@@ -1,9 +1,9 @@
-var CACHE = 'mac-v3';
+var CACHE = 'mac-v4';
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open(CACHE).then(function(c) {
-      return c.addAll(['./', 'index.html', 'manifest.json']);
+      return c.addAll(['./', 'index.html', 'manifest.json', 'icon.svg', 'icon-maskable.svg']);
     }).then(function() { return self.skipWaiting(); })
   );
 });
