@@ -1,6 +1,6 @@
 {
-  "name": "MAC Konverter",
-  "short_name": "MAC",
+  "name": "Netzwerk-Tools",
+  "short_name": "Netzwerk",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f0f2f5",
