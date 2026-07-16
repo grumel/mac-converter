@@ -1,10 +1,11 @@
 {
   "name": "Netzwerk-Tools",
   "short_name": "Netzwerk",
+  "description": "Netzwerk-Werkzeuge für den Admin-Alltag: MAC-Konverter, Subnetzrechner, IPv6-Analyse, Port-Suche, Passwort-Generator",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#47489a",
-  "theme_color": "#3a7bd5",
+  "background_color": "#34357e",
+  "theme_color": "#34357e",
   "icons": [
     {
       "src": "icon.svg",

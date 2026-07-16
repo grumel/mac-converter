@@ -3,31 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#1e3a5f">
+<meta name="theme-color" content="#34357e">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%2347489a'/><circle cx='32' cy='32' r='14' fill='none' stroke='white' stroke-width='3'/><line x1='32' y1='18' x2='32' y2='46' stroke='white' stroke-width='2'/><line x1='18' y1='32' x2='46' y2='32' stroke='white' stroke-width='2'/><ellipse cx='32' cy='32' rx='7' ry='14' fill='none' stroke='white' stroke-width='2'/><circle cx='32' cy='32' r='3' fill='white'/></svg>">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
 <title>Netzwerk-Tools</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: "Segoe UI", Arial, sans-serif; background: linear-gradient(135deg, #47489a 0%, #3b6bb8 45%, #4a8ec8 100%); display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
-.wrap { width: 100%; max-width: 680px; }
-h1 { font-size: 22px; font-weight: 700; margin-bottom: 1.2rem; color: #ffffff; letter-spacing: 0.03em; }
+body { font-family: "Segoe UI", system-ui, Arial, sans-serif; background: linear-gradient(150deg, #34357e 0%, #3b64ad 50%, #4694cf 100%); display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
+.wrap { width: 100%; max-width: 720px; }
+h1 { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 700; margin-bottom: 1.1rem; color: #ffffff; letter-spacing: 0.02em; }
+h1 img { width: 34px; height: 34px; border-radius: 9px; box-shadow: 0 2px 8px rgba(10,15,40,0.35); }
 
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
-.tab { padding: 8px 16px; border-radius: 8px 8px 0 0; border: none; font-size: 14px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); transition: all 0.15s; }
-.tab.active { background: rgba(255,255,255,0.95); color: #1a2535; }
-.tab:hover:not(.active) { background: rgba(255,255,255,0.25); color: #fff; }
+.tabs { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 1rem; }
+.tab { padding: 9px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25); font-size: 14px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.82); transition: background 0.15s, color 0.15s; }
+.tab.active { background: #ffffff; color: #27306b; border-color: #ffffff; box-shadow: 0 3px 10px rgba(10,15,40,0.30); }
+.tab:hover:not(.active) { background: rgba(255,255,255,0.22); color: #fff; }
 
 .panel { display: none; }
 .panel.active { display: block; }
 
-.box { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); border-radius: 0 12px 12px 12px; padding: 1.3rem; margin-bottom: 0.9rem; backdrop-filter: blur(4px); }
-.box:not(:first-child) { border-radius: 12px; }
+.box { background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.20); border-radius: 14px; padding: 1.3rem; margin-bottom: 0.9rem; backdrop-filter: blur(6px); box-shadow: 0 4px 16px rgba(10,15,40,0.18); }
 label { font-size: 15px; color: #d8eeff; display: block; margin-bottom: 8px; font-weight: 500; }
 input { width: 100%; font-family: "Courier New", monospace; font-size: 18px; padding: 10px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; outline: none; background: rgba(255,255,255,0.95); color: #1a2535; }
-input:focus { border-color: #0e8a99; box-shadow: 0 0 0 3px rgba(14,138,153,0.35); }
+input:focus { border-color: #19b8cb; box-shadow: 0 0 0 3px rgba(25,184,203,0.35); }
 input::placeholder { color: #8aaccc; }
-.err { font-size: 14px; color: #ffaaaa; margin-top: 6px; display: none; }
+.err { font-size: 14px; color: #ffd6d6; background: rgba(255,90,90,0.16); border: 1px solid rgba(255,130,130,0.35); border-radius: 8px; padding: 7px 11px; margin-top: 8px; display: none; }
 
 .vendor { background: rgba(255,255,255,0.95); border-radius: 12px; padding: 1rem 1.3rem; margin-bottom: 0.9rem; display: none; }
 .vendor-lbl { font-size: 11px; color: #0e7585; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.07em; }
@@ -64,17 +64,33 @@ input::placeholder { color: #8aaccc; }
 .port-name { font-weight: 600; color: #0e4a65; }
 .port-desc { color: #445; font-size: 13px; }
 .port-nores { text-align: center; padding: 2rem; color: rgba(255,255,255,0.5); font-size: 15px; }
+
+.btn { padding: 9px 24px; border: none; border-radius: 8px; background: #0e7585; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 8px rgba(10,15,40,0.25); transition: background 0.15s; }
+.btn:hover { background: #0c8ba0; }
+.opts { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 4px 0 14px; }
+.opts label { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 14px; font-weight: 500; cursor: pointer; }
+.opts input { width: auto; accent-color: #19b8cb; }
+input.num-inp { width: 110px; }
+.split-inputs { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; }
+.sep { border-top: 1px solid rgba(255,255,255,0.2); margin: 1rem 0; }
+@media (max-width: 540px) {
+  .fmt { flex-wrap: wrap; }
+  .fmt-lbl { width: 100%; }
+  .net-grid, .net-inputs, .split-inputs { grid-template-columns: 1fr; }
+  .slash { display: none; }
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Netzwerk-Tools</h1>
+  <h1><img src="icon.svg" alt=""> Netzwerk-Tools</h1>
 
   <div class="tabs">
     <button class="tab active" onclick="switchTab('mac',this)">MAC-Konverter</button>
     <button class="tab" onclick="switchTab('net',this)">Netzwerkrechner</button>
+    <button class="tab" onclick="switchTab('v6',this)">IPv6</button>
     <button class="tab" onclick="switchTab('port',this)">Port-Suche</button>
-
+    <button class="tab" onclick="switchTab('pw',this)">Passwörter</button>
     <button class="tab" onclick="switchTab('whois',this)">Domain/IP Info</button>
   </div>
 
@@ -131,6 +147,28 @@ input::placeholder { color: #8aaccc; }
       <div class="err" id="net2-err"></div>
     </div>
     <div id="net2-out"></div>
+
+    <div class="sep"></div>
+
+    <div class="box">
+      <label style="margin-bottom:1rem; display:block;">Netz in kleinere Subnetze aufteilen</label>
+      <div class="split-inputs">
+        <div>
+          <label>Netzadresse</label>
+          <input id="split-ip" type="text" placeholder="10.20.0.0" oninput="runSplit()" onpaste="setTimeout(runSplit,10)" />
+        </div>
+        <div>
+          <label>Präfix</label>
+          <input id="split-p1" type="text" placeholder="16" oninput="runSplit()" />
+        </div>
+        <div>
+          <label>Neues Präfix</label>
+          <input id="split-p2" type="text" placeholder="24" oninput="runSplit()" />
+        </div>
+      </div>
+      <div class="err" id="split-err"></div>
+    </div>
+    <div id="split-out"></div>
   </div>
 
   <!-- Domain/IP Info Tab -->
@@ -140,10 +178,42 @@ input::placeholder { color: #8aaccc; }
       <input id="whois-inp" type="text" placeholder="z.B. netzblitz.de oder 8.8.8.8"
              onkeydown="if(event.key==='Enter') doWhois()" />
       <div style="margin-top:0.8rem;">
-        <button id="whois-btn" onclick="doWhois()" style="padding:9px 24px;border:none;border-radius:7px;background:#0e7585;color:#fff;font-size:15px;font-weight:700;cursor:pointer;">Abfragen</button>
+        <button id="whois-btn" class="btn" onclick="doWhois()">Abfragen</button>
       </div>
     </div>
     <div id="whois-out"></div>
+  </div>
+
+  <!-- IPv6 Tab -->
+  <div id="tab-v6" class="panel">
+    <div class="box">
+      <label>IPv6-Adresse (optional mit /Präfix)</label>
+      <input id="v6-inp" type="text" placeholder="z.B. 2001:db8:0:8d3::a:1f/64"
+             oninput="runV6(this.value)"
+             onpaste="var el=this; setTimeout(function(){ runV6(el.value); }, 10)" />
+      <div class="err" id="v6-err"></div>
+    </div>
+    <div id="v6-out"></div>
+    <div class="hint" id="v6-hint">IPv6-Adresse eingeben — Schreibweisen und Analyse erscheinen hier</div>
+  </div>
+
+  <!-- Passwort Tab -->
+  <div id="tab-pw" class="panel">
+    <div class="box">
+      <label>Länge</label>
+      <input id="pw-len" class="num-inp" type="number" min="4" max="128" value="20" oninput="runPw()" />
+      <div class="opts" style="margin-top:12px;">
+        <label><input type="checkbox" id="pw-low" checked onchange="runPw()"> Kleinbuchstaben</label>
+        <label><input type="checkbox" id="pw-up" checked onchange="runPw()"> Großbuchstaben</label>
+        <label><input type="checkbox" id="pw-dig" checked onchange="runPw()"> Ziffern</label>
+        <label><input type="checkbox" id="pw-sym" checked onchange="runPw()"> Sonderzeichen</label>
+        <label><input type="checkbox" id="pw-nosim" checked onchange="runPw()"> Ähnliche Zeichen vermeiden (0/O, 1/l/I)</label>
+      </div>
+      <button class="btn" onclick="runPw()">Neu generieren</button>
+      <div class="err" id="pw-err"></div>
+    </div>
+    <div id="pw-out"></div>
+    <div class="hint" style="padding:0.8rem;">Wird lokal im Browser erzeugt — nichts verlässt das Gerät.</div>
   </div>
 
   <!-- Port Tab -->
@@ -168,6 +238,12 @@ function switchTab(name, btn) {
   btn.classList.add('active');
 }
 
+/* ── Gemeinsame Helfer ── */
+function netRow(lbl,val,sub,wide){
+  return '<div class="net-row'+(wide?' wide':'')+'"><div class="net-lbl">'+lbl+'</div><div class="net-val">'+val+'</div>'+(sub?'<div class="net-sub">'+sub+'</div>':'')+'</div>';
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 /* ══════════════════════════════
    MAC-KONVERTER
 ══════════════════════════════ */
@@ -175,9 +251,18 @@ var MAC_FMTS = [
   ["IEEE 802",              function(b){ return b.join(':'); }],
   ["Windows (Bindestrich)", function(b){ return b.map(u).join('-'); }],
   ["Ohne Trennzeichen",     function(b){ return b.map(u).join(''); }],
-  ["Cisco (Gruppen à 4)",  function(b){ var h=b.join('').toUpperCase(); return h.slice(0,4)+'.'+h.slice(4,8)+'.'+h.slice(8); }]
+  ["Cisco (Gruppen à 4)",  function(b){ var h=b.join('').toUpperCase(); return h.slice(0,4)+'.'+h.slice(4,8)+'.'+h.slice(8); }],
+  ["IPv6 Link-Local (EUI-64)", eui64]
 ];
 function u(x){ return x.toUpperCase(); }
+
+function eui64(b) {
+  var x = parseInt(b[0],16) ^ 0x02;
+  var e = [(x<16?'0':'')+x.toString(16), b[1], b[2], 'ff', 'fe', b[3], b[4], b[5]];
+  var h = [];
+  for (var i=0;i<8;i+=2) h.push(parseInt(e[i]+e[i+1],16).toString(16));
+  return 'fe80::' + h.join(':');
+}
 
 function parseMAC(raw) {
   var s = raw.replace(/[^0-9a-fA-F]/g,'');
@@ -200,6 +285,13 @@ function runMAC(val) {
     var v=MAC_FMTS[i][1](b);
     html+='<div class="fmt"><span class="fmt-lbl">'+MAC_FMTS[i][0]+'</span><span class="fmt-val" id="mv'+i+'">'+v+'</span><button class="copy" onclick="cp(\'mv'+i+'\',this)">Kopieren</button></div>';
   }
+  var b0 = parseInt(b[0],16);
+  html+='<div class="net-grid" style="margin-top:8px;">'
+    +netRow('OUI (Hersteller-Teil)', b.slice(0,3).map(u).join(':'), '')
+    +netRow('NIC (Geräte-Teil)', b.slice(3).map(u).join(':'), '')
+    +netRow('Adresstyp', (b0&1)?'Multicast':'Unicast', 'I/G-Bit')
+    +netRow('Vergabe', (b0&2)?'Lokal verwaltet':'Global (IEEE-OUI)', 'U/L-Bit')
+  +'</div>';
   out.innerHTML=html;
   vval.textContent='…'; vcard.style.display='block';
   clearTimeout(vendorTimer);
@@ -280,20 +372,16 @@ function runNet() {
   var first=cidr>=31?network:(network+1)>>>0;
   var last=cidr>=31?broadcast:(broadcast-1)>>>0;
 
-  function row(lbl,val,sub,wide){
-    return '<div class="net-row'+(wide?' wide':'')+'"><div class="net-lbl">'+lbl+'</div><div class="net-val">'+val+'</div>'+(sub?'<div class="net-sub">'+sub+'</div>':'')+'</div>';
-  }
-
   out.innerHTML='<div class="net-grid">'
-    +row('Netzwerkadresse', ip2str(network)+'/'+cidr, '', true)
-    +row('Subnetzmaske', ip2str(mask), '')
-    +row('Wildcard-Maske', ip2str(wildcard), '')
-    +row('Broadcast', ip2str(broadcast), '')
-    +row('Erster Host', ip2str(first), '')
-    +row('Letzter Host', ip2str(last), '')
-    +row('Nutzbare Hosts', hosts.toLocaleString('de'), '')
-    +row('IP-Klasse', ipClass(ip), '')
-    +row('Eingegebene IP', ip2str(ip), cidr<32?('Hostanteil: '+ip2str((ip&wildcard)>>>0)):'')
+    +netRow('Netzwerkadresse', ip2str(network)+'/'+cidr, '', true)
+    +netRow('Subnetzmaske', ip2str(mask), '')
+    +netRow('Wildcard-Maske', ip2str(wildcard), '')
+    +netRow('Broadcast', ip2str(broadcast), '')
+    +netRow('Erster Host', ip2str(first), '')
+    +netRow('Letzter Host', ip2str(last), '')
+    +netRow('Nutzbare Hosts', hosts.toLocaleString('de'), '')
+    +netRow('IP-Klasse', ipClass(ip), '')
+    +netRow('Eingegebene IP', ip2str(ip), cidr<32?('Hostanteil: '+ip2str((ip&wildcard)>>>0)):'')
   +'</div>';
 }
 
@@ -323,20 +411,16 @@ function runNet2() {
   var first=cidr>=31?network:(network+1)>>>0;
   var last=cidr>=31?broadcast:(broadcast-1)>>>0;
 
-  function row(lbl,val,sub,wide){
-    return '<div class="net-row'+(wide?' wide':'')+'"><div class="net-lbl">'+lbl+'</div><div class="net-val">'+val+'</div>'+(sub?'<div class="net-sub">'+sub+'</div>':'')+'</div>';
-  }
-
   out.innerHTML='<div class="net-grid" style="margin-top:0.7rem;">'
-    +row('Kleinstes Subnetz', ip2str(network)+'/'+cidr, '', true)
-    +row('Subnetzmaske', ip2str(mask), '')
-    +row('Wildcard-Maske', ip2str(wildcard), '')
-    +row('Broadcast', ip2str(broadcast), '')
-    +row('Erster Host', ip2str(first), '')
-    +row('Letzter Host', ip2str(last), '')
-    +row('Nutzbare Hosts', hosts.toLocaleString('de'), '')
-    +row('Erste IP', ip2str(a), '')
-    +row('Zweite IP', ip2str(b), '')
+    +netRow('Kleinstes Subnetz', ip2str(network)+'/'+cidr, '', true)
+    +netRow('Subnetzmaske', ip2str(mask), '')
+    +netRow('Wildcard-Maske', ip2str(wildcard), '')
+    +netRow('Broadcast', ip2str(broadcast), '')
+    +netRow('Erster Host', ip2str(first), '')
+    +netRow('Letzter Host', ip2str(last), '')
+    +netRow('Nutzbare Hosts', hosts.toLocaleString('de'), '')
+    +netRow('Erste IP', ip2str(a), '')
+    +netRow('Zweite IP', ip2str(b), '')
   +'</div>';
 }
 
@@ -425,7 +509,7 @@ function runPort(val) {
     return String(p[0])===val || p[2].toLowerCase().indexOf(val)!==-1 || p[3].toLowerCase().indexOf(val)!==-1;
   });
   if(!results.length){
-    out.innerHTML='<div class="port-nores">Kein Eintrag für „'+val+'" gefunden</div>';
+    out.innerHTML='<div class="port-nores">Kein Eintrag für „'+esc(val)+'" gefunden</div>';
     return;
   }
   var proto_html = {
@@ -443,30 +527,247 @@ function runPort(val) {
 }
 
 /* ══════════════════════════════
-   REVERSE DNS / WHOIS
-   Gemeinsame HackerTarget-Hilfsfunktion
+   SUBNETZ-SPLITTER
 ══════════════════════════════ */
+function parsePrefix(s) {
+  if(!/^\d{1,2}$/.test(s)) return null;
+  var p=parseInt(s,10);
+  return p>32?null:p;
+}
 
-/* Whois – öffnet whois.com im neuen Tab */
+function runSplit() {
+  var ipStr=document.getElementById('split-ip').value.trim(),
+      p1Str=document.getElementById('split-p1').value.trim(),
+      p2Str=document.getElementById('split-p2').value.trim(),
+      err=document.getElementById('split-err'), out=document.getElementById('split-out');
+  if(!ipStr&&!p1Str&&!p2Str){ err.style.display='none'; out.innerHTML=''; return; }
+  var ip=parseIP(ipStr);
+  if(ip===null&&ipStr){ err.textContent='Ungültige Netzadresse.'; err.style.display='block'; out.innerHTML=''; return; }
+  var p1=p1Str?parsePrefix(p1Str):null;
+  if(p1===null&&p1Str){ err.textContent='Ungültiges Präfix (0–32).'; err.style.display='block'; out.innerHTML=''; return; }
+  var p2=p2Str?parsePrefix(p2Str):null;
+  if(p2===null&&p2Str){ err.textContent='Ungültiges neues Präfix (0–32).'; err.style.display='block'; out.innerHTML=''; return; }
+  if(ip===null||p1===null||p2===null){ err.style.display='none'; out.innerHTML=''; return; }
+  if(p2<=p1){ err.textContent='Das neue Präfix muss größer als /'+p1+' sein.'; err.style.display='block'; out.innerHTML=''; return; }
+  err.style.display='none';
+
+  var mask1=p1===0?0:(0xFFFFFFFF<<(32-p1))>>>0;
+  var network=(ip&mask1)>>>0;
+  var note=network!==ip?'Eingabe war eine Host-Adresse — verwendet wird '+ip2str(network)+'/'+p1:'';
+  var count=Math.pow(2,p2-p1), size=Math.pow(2,32-p2);
+  var hosts=p2>=31?size:size-2;
+
+  var html='<div class="net-grid" style="margin-top:0.7rem;">'
+    +netRow('Aufteilung', ip2str(network)+'/'+p1+' → /'+p2, note, true)
+    +netRow('Anzahl Subnetze', count.toLocaleString('de'), '')
+    +netRow('Nutzbare Hosts je Subnetz', hosts.toLocaleString('de'), '')
+  +'</div>';
+
+  var shown=Math.min(count,32), rows='';
+  for(var i=0;i<shown;i++){
+    var s=(network+i*size)>>>0, bc=(s+size-1)>>>0;
+    var f=p2>=31?s:(s+1)>>>0, l=p2>=31?bc:(bc-1)>>>0;
+    rows+='<tr><td class="port-num">'+ip2str(s)+'/'+p2+'</td><td class="port-desc">'+ip2str(f)+' – '+ip2str(l)+'</td><td class="port-desc">'+ip2str(bc)+'</td></tr>';
+  }
+  if(count>shown) rows+='<tr><td colspan="3" style="text-align:center;color:#889;">… und '+(count-shown).toLocaleString('de')+' weitere Subnetze</td></tr>';
+  html+='<div style="background:rgba(255,255,255,0.95);border-radius:8px;overflow:hidden;margin-top:6px;">'
+    +'<table class="port-table"><thead><tr><th>Subnetz</th><th>Hostbereich</th><th>Broadcast</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  out.innerHTML=html;
+}
+
+/* ══════════════════════════════
+   IPv6-ANALYSE
+══════════════════════════════ */
+function pad4(n){ var s=n.toString(16); while(s.length<4) s='0'+s; return s; }
+
+function parseIPv6(str) {
+  var s=str.trim().toLowerCase(), pfx=null;
+  var sl=s.indexOf('/');
+  if(sl!==-1){
+    var ps=s.slice(sl+1);
+    if(!/^\d{1,3}$/.test(ps)) return null;
+    pfx=parseInt(ps,10);
+    if(pfx>128) return null;
+    s=s.slice(0,sl);
+  }
+  var pct=s.indexOf('%');
+  if(pct!==-1) s=s.slice(0,pct);
+  if(s===''||s.indexOf(':::')!==-1) return null;
+  var dbl=s.indexOf('::');
+  if(dbl!==s.lastIndexOf('::')) return null;
+  function groups(part){
+    if(part==='') return [];
+    var gs=part.split(':'), out=[];
+    for(var i=0;i<gs.length;i++){
+      var g=gs[i];
+      if(g==='') return null;
+      if(g.indexOf('.')!==-1){
+        if(i!==gs.length-1) return null;
+        var v4=parseIP(g);
+        if(v4===null) return null;
+        out.push((v4>>>16)&0xFFFF, v4&0xFFFF);
+      } else {
+        if(!/^[0-9a-f]{1,4}$/.test(g)) return null;
+        out.push(parseInt(g,16));
+      }
+    }
+    return out;
+  }
+  var h;
+  if(dbl!==-1){
+    var L=groups(s.slice(0,dbl)), R=groups(s.slice(dbl+2));
+    if(L===null||R===null||L.length+R.length>7) return null;
+    h=L.slice();
+    var fill=8-L.length-R.length;
+    for(var i=0;i<fill;i++) h.push(0);
+    h=h.concat(R);
+  } else {
+    h=groups(s);
+    if(h===null||h.length!==8) return null;
+  }
+  return { h:h, pfx:pfx };
+}
+
+function comp6(h) {
+  var best=-1,bestLen=0,cur=-1,curLen=0;
+  for(var i=0;i<8;i++){
+    if(h[i]===0){ if(cur===-1)cur=i; curLen++; if(curLen>bestLen){best=cur;bestLen=curLen;} }
+    else { cur=-1; curLen=0; }
+  }
+  function hx(g){ return g.toString(16); }
+  if(bestLen<2) return h.map(hx).join(':');
+  return h.slice(0,best).map(hx).join(':')+'::'+h.slice(best+bestLen).map(hx).join(':');
+}
+
+function ip6Type(h) {
+  var sum=0; for(var i=0;i<8;i++) sum+=h[i];
+  if(sum===0) return 'Unspezifiziert (::)';
+  if(sum===1&&h[7]===1) return 'Loopback (::1)';
+  if(h[0]===0&&h[1]===0&&h[2]===0&&h[3]===0&&h[4]===0&&h[5]===0xFFFF) return 'IPv4-gemappt (::ffff:0:0/96)';
+  if((h[0]&0xFFC0)===0xFE80) return 'Link-Local (fe80::/10)';
+  if((h[0]&0xFE00)===0xFC00) return 'Unique Local — privat (fc00::/7)';
+  if((h[0]&0xFF00)===0xFF00) return 'Multicast (ff00::/8)';
+  if(h[0]===0x2001&&h[1]===0x0DB8) return 'Dokumentation (2001:db8::/32)';
+  if((h[0]&0xE000)===0x2000) return 'Global Unicast (2000::/3)';
+  return 'Reserviert / Sonderbereich';
+}
+
+function rdns6(h) {
+  var nib='';
+  for(var i=0;i<8;i++) nib+=pad4(h[i]);
+  return nib.split('').reverse().join('.')+'.ip6.arpa';
+}
+
+function net6(h,p) {
+  var out=[];
+  for(var i=0;i<8;i++){
+    var bits=Math.max(0,Math.min(16,p-16*i));
+    out.push(bits===0?0:(h[i]&((0xFFFF<<(16-bits))&0xFFFF)));
+  }
+  return out;
+}
+
+function runV6(val) {
+  var err=document.getElementById('v6-err'), out=document.getElementById('v6-out'),
+      hint=document.getElementById('v6-hint');
+  if(!val||val.trim()===''){ err.style.display='none'; out.innerHTML=''; hint.style.display='block'; return; }
+  var r=parseIPv6(val);
+  if(!r){ err.textContent='Keine gültige IPv6-Adresse.'; err.style.display='block'; out.innerHTML=''; hint.style.display='none'; return; }
+  err.style.display='none'; hint.style.display='none';
+  var h=r.h, full=h.map(pad4).join(':');
+  function longVal(v){ return '<span style="word-break:break-all;">'+v+'</span>'; }
+  var html='<div class="net-grid">'
+    +netRow('Komprimiert (RFC 5952)', longVal(comp6(h)+(r.pfx!==null?'/'+r.pfx:'')), '', true)
+    +netRow('Vollständig', longVal(full), '', true)
+    +netRow('Typ', ip6Type(h), '', true);
+  if(h[0]===0&&h[1]===0&&h[2]===0&&h[3]===0&&h[4]===0&&h[5]===0xFFFF)
+    html+=netRow('Eingebettete IPv4', ((h[6]>>>8)&255)+'.'+(h[6]&255)+'.'+((h[7]>>>8)&255)+'.'+(h[7]&255), '', true);
+  if(r.pfx!==null)
+    html+=netRow('Netzwerk', longVal(comp6(net6(h,r.pfx))+'/'+r.pfx), '', true);
+  html+=netRow('Reverse DNS', '<span style="font-size:13px;word-break:break-all;">'+rdns6(h)+'</span>', '', true)
+    +'</div>';
+  out.innerHTML=html;
+}
+
+/* ══════════════════════════════
+   PASSWORT-GENERATOR
+══════════════════════════════ */
+var PW_SETS=[
+  ['pw-low','abcdefghijklmnopqrstuvwxyz'],
+  ['pw-up','ABCDEFGHIJKLMNOPQRSTUVWXYZ'],
+  ['pw-dig','0123456789'],
+  ['pw-sym','!#$%&()*+,-./:;=?@[]^_{}~']
+];
+
+function pwRand(n) {
+  if(window.crypto&&window.crypto.getRandomValues){
+    var a=new Uint32Array(1), lim=4294967296-(4294967296%n);
+    do{ window.crypto.getRandomValues(a); }while(a[0]>=lim);
+    return a[0]%n;
+  }
+  return Math.floor(Math.random()*n);
+}
+
+function runPw() {
+  var err=document.getElementById('pw-err'), out=document.getElementById('pw-out');
+  var len=parseInt(document.getElementById('pw-len').value,10);
+  if(isNaN(len)) len=20;
+  if(len<4) len=4;
+  if(len>128) len=128;
+  var noSim=document.getElementById('pw-nosim').checked;
+  var sets=[];
+  for(var i=0;i<PW_SETS.length;i++){
+    if(document.getElementById(PW_SETS[i][0]).checked){
+      var cs=PW_SETS[i][1];
+      if(noSim) cs=cs.replace(/[Il1O0o]/g,'');
+      sets.push(cs);
+    }
+  }
+  if(!sets.length){ err.textContent='Mindestens eine Zeichengruppe auswählen.'; err.style.display='block'; out.innerHTML=''; return; }
+  err.style.display='none';
+  var pool=sets.join(''), pws=[], html='';
+  for(var k=0;k<5;k++){
+    var ch=[];
+    for(var i=0;i<sets.length;i++) ch.push(sets[i].charAt(pwRand(sets[i].length)));
+    while(ch.length<len) ch.push(pool.charAt(pwRand(pool.length)));
+    for(var i=ch.length-1;i>0;i--){ var j=pwRand(i+1), t=ch[i]; ch[i]=ch[j]; ch[j]=t; }
+    pws.push(ch.join(''));
+    html+='<div class="fmt"><span class="fmt-val" id="pwv'+k+'" style="word-break:break-all;"></span><button class="copy" onclick="cp(\'pwv'+k+'\',this)">Kopieren</button></div>';
+  }
+  out.innerHTML=html;
+  // textContent statt innerHTML: Sonderzeichen wie < dürfen kein Markup werden
+  for(var k=0;k<5;k++) document.getElementById('pwv'+k).textContent=pws[k];
+}
+
+/* ══════════════════════════════
+   WHOIS — öffnet whois.com im neuen Tab
+══════════════════════════════ */
 function doWhois() {
   var inp = document.getElementById('whois-inp').value.trim();
   if (!inp) return;
   window.open('https://www.whois.com/whois/' + encodeURIComponent(inp), '_blank');
 }
 
-function htCard(html){ return '<div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:1rem 1.3rem;">'+html+'</div>'; }
-function htNetRow(lbl,val){ return '<div class="net-row wide"><div class="net-lbl">'+lbl+'</div><div class="net-val" style="font-size:14px;word-break:break-all;">'+val+'</div></div>'; }
-
 /* ── Kopieren ── */
 function cp(id, btn) {
   var val=document.getElementById(id).textContent;
-  try {
-    var ta=document.createElement('textarea'); ta.value=val; ta.style.position='fixed'; ta.style.top='-9999px';
-    document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  function done(){
     btn.textContent='✓ Kopiert'; btn.className='copy ok';
     setTimeout(function(){ btn.textContent='Kopieren'; btn.className='copy'; },1500);
-  } catch(e){}
+  }
+  function fallback(){
+    try {
+      var ta=document.createElement('textarea'); ta.value=val; ta.style.position='fixed'; ta.style.top='-9999px';
+      document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      done();
+    } catch(e){}
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(val).then(done,fallback); }
+  else fallback();
 }
+
+/* Passwort-Tab direkt befüllen, damit er nicht leer startet */
+runPw();
 </script>
 <script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }</script>
 </body>
