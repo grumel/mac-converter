@@ -1,7 +1,7 @@
 self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open('mac-v1').then(function(c) {
-      return c.addAll(['mac-converter.html', 'manifest.json']);
+    caches.open('mac-v2').then(function(c) {
+      return c.addAll(['./', 'index.html', 'manifest.json']);
     })
   );
 });
