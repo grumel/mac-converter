@@ -1,4 +1,4 @@
-var CACHE = 'mac-v5';
+var CACHE = 'mac-v7';
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
